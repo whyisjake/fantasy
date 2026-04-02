@@ -78,7 +78,6 @@ function RosterSection({
             <th className="px-3 py-2 sticky left-0 bg-gray-950 z-10">Player</th>
             <th className="px-2 py-2 w-12">Team</th>
             <th className="px-2 py-2 w-16">Elig</th>
-            <th className="px-2 py-2 w-16">Status</th>
             {categories.map((cat) => (
               <StatHeader key={cat.stat_id} category={cat} />
             ))}
@@ -88,7 +87,7 @@ function RosterSection({
           {players.map((player) => (
             <tr key={player.player_key} className="hover:bg-gray-800/30 transition">
               <td className="px-3 py-2 font-medium text-purple-400">
-                {player.roster_position}
+                {player.roster_position || player.position?.split(",")[0]}
               </td>
               <td className="px-3 py-2 font-medium text-white sticky left-0 bg-gray-950/95 z-10">
                 <div className="flex items-center gap-2">
@@ -100,26 +99,26 @@ function RosterSection({
                     </div>
                   )}
                   <span>{player.name}</span>
+                  {player.status && (
+                    <span
+                      className={`inline-flex rounded px-1.5 py-0.5 text-xs font-medium ${
+                        player.status.startsWith("IL")
+                          ? "bg-red-900/30 text-red-400"
+                          : player.status === "DTD"
+                          ? "bg-yellow-900/30 text-yellow-400"
+                          : player.status === "NA"
+                          ? "bg-gray-800 text-gray-400"
+                          : "bg-gray-800 text-gray-400"
+                      }`}
+                      title={player.status_full}
+                    >
+                      {player.status}
+                    </span>
+                  )}
                 </div>
               </td>
               <td className="px-2 py-2 text-gray-400">{player.team}</td>
               <td className="px-2 py-2 text-gray-400">{player.position}</td>
-              <td className="px-2 py-2">
-                {player.status && (
-                  <span
-                    className={`inline-flex rounded px-1.5 py-0.5 text-xs font-medium ${
-                      player.status === "IL"
-                        ? "bg-red-900/30 text-red-400"
-                        : player.status === "DTD"
-                        ? "bg-yellow-900/30 text-yellow-400"
-                        : "bg-gray-800 text-gray-400"
-                    }`}
-                    title={player.status_full}
-                  >
-                    {player.status}
-                  </span>
-                )}
-              </td>
               {categories.map((cat) => (
                 <td
                   key={cat.stat_id}

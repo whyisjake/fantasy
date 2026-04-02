@@ -103,8 +103,16 @@ function parseRoster(data: Record<string, unknown>) {
               if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr;
               if ("display_position" in obj) playerInfo.position = obj.display_position;
               if ("selected_position" in obj) {
-                const sp = obj.selected_position as Array<Record<string, unknown>>;
-                playerInfo.roster_position = sp?.[0]?.position;
+                const sp = obj.selected_position;
+                // Yahoo nests this as either an array or object
+                if (Array.isArray(sp)) {
+                  // Could be [{position: "C"}] or [{selected_position: {position: "C"}}]
+                  const first = sp[0] as Record<string, unknown>;
+                  playerInfo.roster_position = (first?.position as string) ||
+                    ((first?.selected_position as Record<string, unknown>)?.position as string);
+                } else if (typeof sp === "object" && sp !== null) {
+                  playerInfo.roster_position = (sp as Record<string, unknown>).position as string;
+                }
               }
               if ("status" in obj) playerInfo.status = obj.status;
               if ("status_full" in obj) playerInfo.status_full = obj.status_full;
