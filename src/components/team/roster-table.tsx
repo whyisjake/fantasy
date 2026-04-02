@@ -33,29 +33,48 @@ export default function RosterTable({ players, statCategories, loading }: Roster
     return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
   });
 
-  // Split into batters and pitchers
-  const batters = sorted.filter((p) => !isPitcher(p.position));
-  const pitchers = sorted.filter((p) => isPitcher(p.position));
+  const NON_ACTIVE = ["BN", "IL", "IL10", "IL15", "IL60", "DL", "NA"];
+
+  // Split into batters and pitchers, then starters vs bench
+  const allBatters = sorted.filter((p) => !isPitcher(p.position));
+  const allPitchers = sorted.filter((p) => isPitcher(p.position));
+
+  const startingBatters = allBatters.filter((p) => !NON_ACTIVE.includes(p.roster_position || ""));
+  const benchBatters = allBatters.filter((p) => NON_ACTIVE.includes(p.roster_position || ""));
+  const startingPitchers = allPitchers.filter((p) => !NON_ACTIVE.includes(p.roster_position || ""));
+  const benchPitchers = allPitchers.filter((p) => NON_ACTIVE.includes(p.roster_position || ""));
 
   const battingCats = statCategories ? getRelevantCategories(statCategories, "batting", true) : [];
   const pitchingCats = statCategories ? getRelevantCategories(statCategories, "pitching", true) : [];
 
   return (
     <div className="space-y-6">
-      {batters.length > 0 && (
+      {startingBatters.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">
             Batters
           </h3>
-          <RosterSection players={batters} categories={battingCats} />
+          <RosterSection players={startingBatters} categories={battingCats} />
         </div>
       )}
-      {pitchers.length > 0 && (
+      {startingPitchers.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">
             Pitchers
           </h3>
-          <RosterSection players={pitchers} categories={pitchingCats} />
+          <RosterSection players={startingPitchers} categories={pitchingCats} />
+        </div>
+      )}
+      {(benchBatters.length > 0 || benchPitchers.length > 0) && (
+        <div>
+          <h3 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">
+            Bench / IL
+          </h3>
+          <RosterSection
+            players={[...benchBatters, ...benchPitchers]}
+            categories={battingCats}
+            dimmed
+          />
         </div>
       )}
     </div>
@@ -65,9 +84,11 @@ export default function RosterTable({ players, statCategories, loading }: Roster
 function RosterSection({
   players,
   categories,
+  dimmed,
 }: {
   players: PlayerWithStats[];
   categories: StatCategory[];
+  dimmed?: boolean;
 }) {
   return (
     <div className="overflow-x-auto">
@@ -85,11 +106,11 @@ function RosterSection({
         </thead>
         <tbody className="divide-y divide-gray-800/50">
           {players.map((player) => (
-            <tr key={player.player_key} className="hover:bg-gray-800/30 transition">
-              <td className="px-3 py-2 font-medium text-purple-400">
+            <tr key={player.player_key} className={`hover:bg-gray-800/30 transition ${dimmed ? "opacity-60" : ""}`}>
+              <td className={`px-3 py-2 font-medium ${dimmed ? "text-gray-500" : "text-purple-400"}`}>
                 {player.roster_position || player.position?.split(",")[0]}
               </td>
-              <td className="px-3 py-2 font-medium text-white sticky left-0 bg-gray-950/95 z-10">
+              <td className={`px-3 py-2 font-medium sticky left-0 bg-gray-950/95 z-10 ${dimmed ? "text-gray-400" : "text-white"}`}>
                 <div className="flex items-center gap-2">
                   {player.headshot ? (
                     <img src={player.headshot} alt="" className="h-6 w-6 rounded-full" />
