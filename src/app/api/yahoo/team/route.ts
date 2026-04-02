@@ -86,31 +86,36 @@ function parseRoster(data: Record<string, unknown>) {
     while (playersObj[String(idx)]) {
       const player = playersObj[String(idx)] as Record<string, unknown>;
       const playerData = player?.player as Array<unknown>;
-      const info = playerData?.[0] as Array<unknown>;
-      const stats = playerData?.[1] as Record<string, unknown>;
 
-      let playerInfo: Record<string, unknown> = {};
-      for (const item of info || []) {
-        if (typeof item === "object" && item !== null) {
-          const obj = item as Record<string, unknown>;
-          if ("player_key" in obj) playerInfo.player_key = obj.player_key;
-          if ("name" in obj) playerInfo.name = (obj.name as Record<string, unknown>)?.full;
-          if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr;
-          if ("display_position" in obj) playerInfo.position = obj.display_position;
-          if ("selected_position" in obj) {
-            const sp = obj.selected_position as Array<Record<string, unknown>>;
-            playerInfo.roster_position = sp?.[0]?.position;
+      const playerInfo: Record<string, unknown> = {};
+
+      // Scan all elements — Yahoo puts info, stats, etc. at varying indices
+      for (let i = 0; i < (playerData?.length || 0); i++) {
+        const element = playerData[i];
+
+        if (Array.isArray(element)) {
+          for (const item of element) {
+            if (typeof item === "object" && item !== null) {
+              const obj = item as Record<string, unknown>;
+              if ("player_key" in obj) playerInfo.player_key = obj.player_key;
+              if ("name" in obj) playerInfo.name = (obj.name as Record<string, unknown>)?.full;
+              if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr;
+              if ("display_position" in obj) playerInfo.position = obj.display_position;
+              if ("selected_position" in obj) {
+                const sp = obj.selected_position as Array<Record<string, unknown>>;
+                playerInfo.roster_position = sp?.[0]?.position;
+              }
+              if ("status" in obj) playerInfo.status = obj.status;
+              if ("status_full" in obj) playerInfo.status_full = obj.status_full;
+            }
           }
-          if ("status" in obj) playerInfo.status = obj.status;
-          if ("status_full" in obj) playerInfo.status_full = obj.status_full;
+        } else if (typeof element === "object" && element !== null) {
+          const obj = element as Record<string, unknown>;
+          if (obj.player_stats) {
+            const ps = obj.player_stats as Record<string, unknown>;
+            playerInfo.stats = ps?.stats;
+          }
         }
-      }
-
-      // Parse stats
-      if (stats?.player_stats) {
-        const ps = stats.player_stats as Record<string, unknown>;
-        const statsList = ps?.stats as Array<Record<string, unknown>>;
-        playerInfo.stats = statsList;
       }
 
       playerList.push(playerInfo);

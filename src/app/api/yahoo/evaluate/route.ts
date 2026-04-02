@@ -218,8 +218,6 @@ function parseRosterForEval(data: Record<string, unknown>): PlayerWithStats[] {
     while (players?.[String(idx)]) {
       const player = players[String(idx)] as Record<string, unknown>;
       const playerData = player?.player as Array<unknown>;
-      const info = playerData?.[0] as Array<unknown>;
-      const statsData = playerData?.[1] as Record<string, unknown>;
 
       const playerInfo: PlayerWithStats = {
         player_key: "",
@@ -228,25 +226,36 @@ function parseRosterForEval(data: Record<string, unknown>): PlayerWithStats[] {
         position: "",
       };
 
-      for (const item of info || []) {
-        if (typeof item === "object" && item !== null) {
-          const obj = item as Record<string, unknown>;
-          if ("player_key" in obj) playerInfo.player_key = obj.player_key as string;
-          if ("name" in obj) playerInfo.name = (obj.name as Record<string, unknown>)?.full as string;
-          if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr as string;
-          if ("display_position" in obj) playerInfo.position = obj.display_position as string;
-          if ("selected_position" in obj) {
-            const sp = obj.selected_position as Array<Record<string, unknown>>;
-            playerInfo.roster_position = sp?.[0]?.position as string;
-          }
-          if ("status" in obj) playerInfo.status = obj.status as string;
-          if ("status_full" in obj) playerInfo.status_full = obj.status_full as string;
-        }
-      }
+      // playerData is an array — first element is info array, rest may contain stats
+      // Scan all elements to find info and stats
+      for (let i = 0; i < (playerData?.length || 0); i++) {
+        const element = playerData[i];
 
-      if (statsData?.player_stats) {
-        const ps = statsData.player_stats as Record<string, unknown>;
-        playerInfo.stats = ps?.stats as PlayerWithStats["stats"];
+        if (Array.isArray(element)) {
+          // This is the player info array (index 0 typically)
+          for (const item of element) {
+            if (typeof item === "object" && item !== null) {
+              const obj = item as Record<string, unknown>;
+              if ("player_key" in obj) playerInfo.player_key = obj.player_key as string;
+              if ("name" in obj) playerInfo.name = (obj.name as Record<string, unknown>)?.full as string;
+              if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr as string;
+              if ("display_position" in obj) playerInfo.position = obj.display_position as string;
+              if ("selected_position" in obj) {
+                const sp = obj.selected_position as Array<Record<string, unknown>>;
+                playerInfo.roster_position = sp?.[0]?.position as string;
+              }
+              if ("status" in obj) playerInfo.status = obj.status as string;
+              if ("status_full" in obj) playerInfo.status_full = obj.status_full as string;
+            }
+          }
+        } else if (typeof element === "object" && element !== null) {
+          // This might be a stats or other sub-resource object
+          const obj = element as Record<string, unknown>;
+          if (obj.player_stats) {
+            const ps = obj.player_stats as Record<string, unknown>;
+            playerInfo.stats = ps?.stats as PlayerWithStats["stats"];
+          }
+        }
       }
 
       playerList.push(playerInfo);
@@ -273,8 +282,6 @@ function parseFreeAgents(data: Record<string, unknown>): PlayerWithStats[] {
     while (players?.[String(idx)]) {
       const player = players[String(idx)] as Record<string, unknown>;
       const playerData = player?.player as Array<unknown>;
-      const info = playerData?.[0] as Array<unknown>;
-      const statsData = playerData?.[1] as Record<string, unknown>;
 
       const playerInfo: PlayerWithStats = {
         player_key: "",
@@ -283,20 +290,27 @@ function parseFreeAgents(data: Record<string, unknown>): PlayerWithStats[] {
         position: "",
       };
 
-      for (const item of info || []) {
-        if (typeof item === "object" && item !== null) {
-          const obj = item as Record<string, unknown>;
-          if ("player_key" in obj) playerInfo.player_key = obj.player_key as string;
-          if ("name" in obj) playerInfo.name = (obj.name as Record<string, unknown>)?.full as string;
-          if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr as string;
-          if ("display_position" in obj) playerInfo.position = obj.display_position as string;
-          if ("headshot" in obj) playerInfo.headshot = (obj.headshot as Record<string, unknown>)?.url as string;
-        }
-      }
+      for (let i = 0; i < (playerData?.length || 0); i++) {
+        const element = playerData[i];
 
-      if (statsData?.player_stats) {
-        const ps = statsData.player_stats as Record<string, unknown>;
-        playerInfo.stats = ps?.stats as PlayerWithStats["stats"];
+        if (Array.isArray(element)) {
+          for (const item of element) {
+            if (typeof item === "object" && item !== null) {
+              const obj = item as Record<string, unknown>;
+              if ("player_key" in obj) playerInfo.player_key = obj.player_key as string;
+              if ("name" in obj) playerInfo.name = (obj.name as Record<string, unknown>)?.full as string;
+              if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr as string;
+              if ("display_position" in obj) playerInfo.position = obj.display_position as string;
+              if ("headshot" in obj) playerInfo.headshot = (obj.headshot as Record<string, unknown>)?.url as string;
+            }
+          }
+        } else if (typeof element === "object" && element !== null) {
+          const obj = element as Record<string, unknown>;
+          if (obj.player_stats) {
+            const ps = obj.player_stats as Record<string, unknown>;
+            playerInfo.stats = ps?.stats as PlayerWithStats["stats"];
+          }
+        }
       }
 
       playerList.push(playerInfo);
