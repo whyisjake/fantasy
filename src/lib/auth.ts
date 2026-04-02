@@ -9,7 +9,11 @@ export const authOptions: NextAuthOptions = {
       type: "oauth",
       authorization: {
         url: "https://api.login.yahoo.com/oauth2/request_auth",
-        params: { scope: "openid fspt-r fspt-w" },
+        params: {
+          scope: "openid fspt-r fspt-w",
+          redirect_uri:
+            process.env.NEXTAUTH_URL + "/api/auth/callback/yahoo",
+        },
       },
       token: {
         url: "https://api.login.yahoo.com/oauth2/get_token",
