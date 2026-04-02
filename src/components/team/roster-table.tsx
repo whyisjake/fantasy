@@ -37,8 +37,8 @@ export default function RosterTable({ players, statCategories, loading }: Roster
   const batters = sorted.filter((p) => !isPitcher(p.position));
   const pitchers = sorted.filter((p) => isPitcher(p.position));
 
-  const battingCats = statCategories ? getRelevantCategories(statCategories, "batting") : [];
-  const pitchingCats = statCategories ? getRelevantCategories(statCategories, "pitching") : [];
+  const battingCats = statCategories ? getRelevantCategories(statCategories, "batting", true) : [];
+  const pitchingCats = statCategories ? getRelevantCategories(statCategories, "pitching", true) : [];
 
   return (
     <div className="space-y-6">

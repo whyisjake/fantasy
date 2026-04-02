@@ -22,11 +22,11 @@ export default function PlayerStatsTable({
   const [sortAsc, setSortAsc] = useState(false);
 
   const battingCats = useMemo(
-    () => getRelevantCategories(statCategories, "batting"),
+    () => getRelevantCategories(statCategories, "batting", true),
     [statCategories]
   );
   const pitchingCats = useMemo(
-    () => getRelevantCategories(statCategories, "pitching"),
+    () => getRelevantCategories(statCategories, "pitching", true),
     [statCategories]
   );
 
