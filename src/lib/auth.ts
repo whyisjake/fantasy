@@ -1,6 +1,6 @@
 import { type NextAuthOptions } from "next-auth";
 
-const DEPLOY_VERSION = "v7-read-only-scope";
+const DEPLOY_VERSION = "v8-fix-jwt-expiry";
 
 console.log(`[fantasy-auth] Loading auth config ${DEPLOY_VERSION}`, {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
@@ -52,13 +52,22 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, account }) {
       if (account) {
+        console.log(`[fantasy-auth] JWT callback with account`, {
+          hasAccessToken: !!account.access_token,
+          hasRefreshToken: !!account.refresh_token,
+          expiresAt: account.expires_at,
+          expiresIn: account.expires_in,
+        });
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
-        token.expiresAt = account.expires_at;
+        // Yahoo may return expires_in (seconds) instead of expires_at (timestamp)
+        token.expiresAt =
+          account.expires_at ??
+          Math.floor(Date.now() / 1000) + (Number(account.expires_in) || 3600);
       }
 
-      // Return token if it hasn't expired
-      if (Date.now() < (token.expiresAt as number) * 1000) {
+      // Return token if it hasn't expired (or if expiresAt is not set)
+      if (!token.expiresAt || Date.now() < (token.expiresAt as number) * 1000) {
         return token;
       }
 
