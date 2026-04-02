@@ -23,12 +23,20 @@ function ErrorContent() {
             "Could not create a user account from the OAuth profile."}
         </p>
       </div>
-      <a
-        href="/"
-        className="rounded bg-gray-700 px-4 py-2 text-sm text-gray-200 hover:bg-gray-600 transition"
-      >
-        Back to Home
-      </a>
+      <div className="flex gap-3">
+        <a
+          href="/api/auth/signout"
+          className="rounded bg-red-700 px-4 py-2 text-sm text-gray-200 hover:bg-red-600 transition"
+        >
+          Sign Out & Retry
+        </a>
+        <a
+          href="/"
+          className="rounded bg-gray-700 px-4 py-2 text-sm text-gray-200 hover:bg-gray-600 transition"
+        >
+          Back to Home
+        </a>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { type NextAuthOptions } from "next-auth";
 
-const DEPLOY_VERSION = "v9-idtoken-true";
+const DEPLOY_VERSION = "v10-es256-alg";
 
 console.log(`[fantasy-auth] Loading auth config ${DEPLOY_VERSION}`, {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
@@ -36,6 +36,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.YAHOO_CLIENT_SECRET,
       client: {
         token_endpoint_auth_method: "client_secret_basic",
+        id_token_signed_response_alg: "ES256",
       },
       checks: ["state"],
       idToken: true,

@@ -1,10 +1,10 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { signIn } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import LeagueSelector from "@/components/layout/league-selector";
 import { useLeague } from "@/lib/league-context";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 interface LeagueInfo {
   name: string;
@@ -14,10 +14,12 @@ interface LeagueInfo {
   current_week: number;
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { data: session, status } = useSession();
   const { leagueKey, setLeagueKey } = useLeague();
   const [leagueInfo, setLeagueInfo] = useState<LeagueInfo | null>(null);
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
 
   useEffect(() => {
     if (!leagueKey) return;
@@ -39,6 +41,19 @@ export default function DashboardPage() {
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] gap-6">
+        {error && (
+          <div className="rounded-lg border border-red-800 bg-red-950/30 p-4 max-w-md text-center">
+            <p className="text-sm text-red-300">
+              Sign-in failed ({error}). Please try again.
+            </p>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="mt-2 text-xs text-red-400 underline hover:text-red-300"
+            >
+              Clear session & retry
+            </button>
+          </div>
+        )}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-white mb-2">
             Fantasy Baseball Manager
@@ -82,6 +97,14 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
   );
 }
 
