@@ -17,7 +17,8 @@ export const authOptions: NextAuthOptions = {
       client: {
         token_endpoint_auth_method: "client_secret_basic",
       },
-      idToken: true,
+      checks: ["state"],
+      idToken: false,
       profile(profile) {
         return {
           id: profile.sub,
@@ -83,5 +84,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/",
+    error: "/auth/error",
   },
 };
