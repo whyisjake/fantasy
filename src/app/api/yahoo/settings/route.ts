@@ -18,9 +18,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "leagueKey required" }, { status: 400 });
   }
 
+  const debug = searchParams.get("debug") === "true";
+
   try {
     const data = await getLeagueSettings(session.accessToken, leagueKey);
+
+    if (debug) {
+      // Return raw Yahoo response for debugging
+      return NextResponse.json({ raw: data });
+    }
+
     const { statCategories, rosterPositions } = parseLeagueSettings(data);
+
+    console.log("[settings] Parsed stat categories:", statCategories.length, "roster positions:", rosterPositions.length);
 
     return NextResponse.json(
       { statCategories, rosterPositions },
