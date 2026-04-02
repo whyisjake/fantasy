@@ -117,6 +117,15 @@ export async function getFreeAgents(
   return data;
 }
 
+// Get all teams in a league (from standings) with their team_keys
+export async function getLeagueTeams(accessToken: string, leagueKey: string) {
+  const data = await yahooFetch({
+    accessToken,
+    path: `/league/${leagueKey}/standings`,
+  });
+  return data;
+}
+
 // Get league settings (stat categories, roster positions)
 export async function getLeagueSettings(accessToken: string, leagueKey: string) {
   const data = await yahooFetch({
