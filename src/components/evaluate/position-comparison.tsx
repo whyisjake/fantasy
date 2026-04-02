@@ -27,12 +27,18 @@ interface PositionSlot {
   upgrade_available: boolean;
 }
 
+interface StatInfo {
+  name: string;
+  is_display_only?: boolean;
+}
+
 interface PositionComparisonProps {
   slot: PositionSlot;
   statNames: string[];
+  statInfo?: StatInfo[];
 }
 
-export default function PositionComparison({ slot, statNames }: PositionComparisonProps) {
+export default function PositionComparison({ slot, statNames, statInfo }: PositionComparisonProps) {
   const [expanded, setExpanded] = useState(slot.upgrade_available);
 
   return (
@@ -78,11 +84,18 @@ export default function PositionComparison({ slot, statNames }: PositionComparis
             <thead>
               <tr className="text-xs text-gray-500 uppercase tracking-wider">
                 <th className="px-4 py-2 text-left w-48">Player</th>
-                {statNames.map((name) => (
-                  <th key={name} className="px-2 py-2 text-right w-16">
-                    {name}
-                  </th>
-                ))}
+                {statNames.map((name, idx) => {
+                  const isDisplayOnly = statInfo?.[idx]?.is_display_only;
+                  return (
+                    <th
+                      key={name}
+                      className={`px-2 py-2 text-right w-16 ${isDisplayOnly ? "text-gray-600" : ""}`}
+                      title={isDisplayOnly ? `${name} (informational, not scored)` : name}
+                    >
+                      {name}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800/50">

@@ -90,10 +90,11 @@ export async function GET(request: NextRequest) {
       faMap.set(position, players);
     }
 
-    // Build evaluation per roster slot (use scoring cats for comparison, all cats for display)
+    // Build evaluation per roster slot (all cats for display, scoring cats for comparison)
     const battingEval = buildPositionEval(
       roster.filter((p) => !isPitcher(p.position)),
       faMap,
+      battingCats,
       battingScoringCats,
       statMap,
       battingPositions
@@ -102,6 +103,7 @@ export async function GET(request: NextRequest) {
     const pitchingEval = buildPositionEval(
       roster.filter((p) => isPitcher(p.position)),
       faMap,
+      pitchingCats,
       pitchingScoringCats,
       statMap,
       pitchingPositions
@@ -152,17 +154,19 @@ export async function GET(request: NextRequest) {
       league: {
         key: leagueKey,
         scoring_categories: {
-          batting: battingScoringCats.map((c) => ({
+          batting: battingCats.map((c) => ({
             stat_id: c.stat_id,
             name: c.display_name,
             display_name: c.name,
             higher_is_better: c.sort_order === "1",
+            is_display_only: c.is_display_only || false,
           })),
-          pitching: pitchingScoringCats.map((c) => ({
+          pitching: pitchingCats.map((c) => ({
             stat_id: c.stat_id,
             name: c.display_name,
             display_name: c.name,
             higher_is_better: c.sort_order === "1",
+            is_display_only: c.is_display_only || false,
           })),
         },
         roster_positions: rosterPositions,
@@ -363,7 +367,8 @@ interface PositionEval {
 function buildPositionEval(
   rosterPlayers: PlayerWithStats[],
   faMap: Map<string, PlayerWithStats[]>,
-  categories: StatCategory[],
+  displayCategories: StatCategory[],
+  scoringCategories: StatCategory[],
   statMap: Map<string, StatCategory>,
   positions: string[]
 ): PositionEval[] {
@@ -380,13 +385,13 @@ function buildPositionEval(
 
     const freeAgents = faMap.get(matchPos) || [];
 
-    // Build player stats
+    // Build player stats (all display categories)
     const playerStats: Record<string, string> = {};
-    for (const cat of categories) {
+    for (const cat of displayCategories) {
       playerStats[cat.display_name] = getStatValue(player.stats, cat.stat_id);
     }
 
-    // Build FA comparisons
+    // Build FA comparisons (only scoring categories for upgrade detection)
     let bestUpgradeScore = 0;
     const topFAs = freeAgents.slice(0, 5).map((fa) => {
       const faStats: Record<string, string> = {};
@@ -394,10 +399,15 @@ function buildPositionEval(
       let upgradeCount = 0;
       let downgradeCount = 0;
 
-      for (const cat of categories) {
+      // Include all display stats in the stats object
+      for (const cat of displayCategories) {
+        faStats[cat.display_name] = getStatValue(fa.stats, cat.stat_id);
+      }
+
+      // Only use scoring categories for comparison/upgrade detection
+      for (const cat of scoringCategories) {
         const faVal = getStatValue(fa.stats, cat.stat_id);
         const playerVal = getStatValue(player.stats, cat.stat_id);
-        faStats[cat.display_name] = faVal;
 
         const higherBetter = isHigherBetter(cat.stat_id, statMap);
         const diff = formatStatDiff(playerVal, faVal, higherBetter);

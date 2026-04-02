@@ -10,8 +10,8 @@ import RecommendationCard from "@/components/evaluate/recommendation-card";
 interface EvalResponse {
   league: {
     scoring_categories: {
-      batting: Array<{ name: string; higher_is_better: boolean }>;
-      pitching: Array<{ name: string; higher_is_better: boolean }>;
+      batting: Array<{ name: string; higher_is_better: boolean; is_display_only?: boolean }>;
+      pitching: Array<{ name: string; higher_is_better: boolean; is_display_only?: boolean }>;
     };
   };
   roster: {
@@ -71,10 +71,10 @@ export default function EvaluatePage() {
     );
   }
 
-  const battingStatNames =
-    evalData?.league.scoring_categories.batting.map((c) => c.name) || [];
-  const pitchingStatNames =
-    evalData?.league.scoring_categories.pitching.map((c) => c.name) || [];
+  const battingCats = evalData?.league.scoring_categories.batting || [];
+  const pitchingCats = evalData?.league.scoring_categories.pitching || [];
+  const battingStatNames = battingCats.map((c) => c.name);
+  const pitchingStatNames = pitchingCats.map((c) => c.name);
 
   return (
     <div className="space-y-6">
@@ -183,6 +183,7 @@ export default function EvaluatePage() {
                     key={i}
                     slot={slot as unknown as Parameters<typeof PositionComparison>[0]["slot"]}
                     statNames={battingStatNames}
+                    statInfo={battingCats}
                   />
                 ))}
               </div>
@@ -201,6 +202,7 @@ export default function EvaluatePage() {
                     key={i}
                     slot={slot as unknown as Parameters<typeof PositionComparison>[0]["slot"]}
                     statNames={pitchingStatNames}
+                    statInfo={pitchingCats}
                   />
                 ))}
               </div>
