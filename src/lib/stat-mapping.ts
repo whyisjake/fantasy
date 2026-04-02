@@ -58,12 +58,21 @@ export function parseLeagueSettings(data: Record<string, unknown>): {
         const statObj = item as Record<string, unknown>;
         const stat = statObj?.stat as Record<string, unknown>;
         if (stat?.stat_id !== undefined) {
-          // Yahoo uses position_type as a direct string ("B" or "P")
-          // and stat_position_types as a nested array
-          const posType = stat.position_type as string | undefined;
-          const posTypes: string[] = posType ? [posType] : [];
+          // Determine position type from multiple possible sources:
+          // 1. group field: "batting" → B, "pitching" → P (most reliable)
+          // 2. position_type field: "B" or "P"
+          // 3. stat_position_types nested array
+          let posTypes: string[] = [];
+          const group = stat.group as string | undefined;
+          if (group === "batting") {
+            posTypes = ["B"];
+          } else if (group === "pitching") {
+            posTypes = ["P"];
+          } else {
+            const posType = stat.position_type as string | undefined;
+            if (posType) posTypes = [posType];
+          }
 
-          // Skip display-only stats (like H/AB, IP) from scoring
           const isDisplayOnly = stat.is_only_display_stat === "1";
 
           statCategories.push({
