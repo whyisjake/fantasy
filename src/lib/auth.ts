@@ -1,6 +1,7 @@
 import { type NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
+  debug: true,
   providers: [
     {
       id: "yahoo",
@@ -10,7 +11,43 @@ export const authOptions: NextAuthOptions = {
         url: "https://api.login.yahoo.com/oauth2/request_auth",
         params: { scope: "openid fspt-r fspt-w" },
       },
-      token: "https://api.login.yahoo.com/oauth2/get_token",
+      token: {
+        url: "https://api.login.yahoo.com/oauth2/get_token",
+        async request({ params, provider }) {
+          const body = new URLSearchParams({
+            grant_type: "authorization_code",
+            code: params.code as string,
+            redirect_uri: provider.callbackUrl,
+            client_id: process.env.YAHOO_CLIENT_ID!,
+            client_secret: process.env.YAHOO_CLIENT_SECRET!,
+          });
+
+          const response = await fetch(
+            "https://api.login.yahoo.com/oauth2/get_token",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Authorization: `Basic ${Buffer.from(
+                  `${process.env.YAHOO_CLIENT_ID}:${process.env.YAHOO_CLIENT_SECRET}`
+                ).toString("base64")}`,
+              },
+              body,
+            }
+          );
+
+          const tokens = await response.json();
+
+          if (!response.ok) {
+            console.error("Yahoo token error:", tokens);
+            throw new Error(
+              `Yahoo token exchange failed: ${JSON.stringify(tokens)}`
+            );
+          }
+
+          return { tokens };
+        },
+      },
       userinfo: "https://api.login.yahoo.com/openid/v1/userinfo",
       clientId: process.env.YAHOO_CLIENT_ID,
       clientSecret: process.env.YAHOO_CLIENT_SECRET,
@@ -43,12 +80,15 @@ export const authOptions: NextAuthOptions = {
           "https://api.login.yahoo.com/oauth2/get_token",
           {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `Basic ${Buffer.from(
+                `${process.env.YAHOO_CLIENT_ID}:${process.env.YAHOO_CLIENT_SECRET}`
+              ).toString("base64")}`,
+            },
             body: new URLSearchParams({
               grant_type: "refresh_token",
               refresh_token: token.refreshToken as string,
-              client_id: process.env.YAHOO_CLIENT_ID!,
-              client_secret: process.env.YAHOO_CLIENT_SECRET!,
             }),
           }
         );
