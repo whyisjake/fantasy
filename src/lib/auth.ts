@@ -1,6 +1,6 @@
 import { type NextAuthOptions } from "next-auth";
 
-const DEPLOY_VERSION = "v6-state-only-no-idtoken";
+const DEPLOY_VERSION = "v7-read-only-scope";
 
 console.log(`[fantasy-auth] Loading auth config ${DEPLOY_VERSION}`, {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
       wellKnown:
         "https://api.login.yahoo.com/.well-known/openid-configuration",
       authorization: {
-        params: { scope: "openid fspt-r fspt-w" },
+        params: { scope: "openid fspt-r" },
       },
       clientId: process.env.YAHOO_CLIENT_ID,
       clientSecret: process.env.YAHOO_CLIENT_SECRET,
