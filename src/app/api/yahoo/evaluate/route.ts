@@ -344,6 +344,7 @@ interface PositionEval {
     team: string;
     position: string;
     status: string | null;
+    headshot?: string;
     stats: Record<string, string>;
   };
   top_free_agents: Array<{
@@ -351,6 +352,7 @@ interface PositionEval {
     name: string;
     team: string;
     position: string;
+    headshot?: string;
     stats: Record<string, string>;
     comparison: Record<string, { diff: string; isUpgrade: boolean; isEqual: boolean }>;
   }>;
@@ -413,6 +415,7 @@ function buildPositionEval(
         name: fa.name,
         team: fa.team,
         position: fa.position,
+        headshot: fa.headshot,
         stats: faStats,
         comparison,
       };
@@ -435,6 +438,7 @@ function buildPositionEval(
         team: player.team,
         position: player.position,
         status: player.status || null,
+        headshot: player.headshot,
         stats: playerStats,
       },
       top_free_agents: topFAs,

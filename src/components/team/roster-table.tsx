@@ -91,7 +91,16 @@ function RosterSection({
                 {player.roster_position}
               </td>
               <td className="px-3 py-2 font-medium text-white sticky left-0 bg-gray-950/95 z-10">
-                {player.name}
+                <div className="flex items-center gap-2">
+                  {player.headshot ? (
+                    <img src={player.headshot} alt="" className="h-6 w-6 rounded-full" />
+                  ) : (
+                    <div className="h-6 w-6 rounded-full bg-gray-800 flex items-center justify-center text-[10px] text-gray-500">
+                      {player.name?.charAt(0)}
+                    </div>
+                  )}
+                  <span>{player.name}</span>
+                </div>
               </td>
               <td className="px-2 py-2 text-gray-400">{player.team}</td>
               <td className="px-2 py-2 text-gray-400">{player.position}</td>

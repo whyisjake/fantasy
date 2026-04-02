@@ -7,6 +7,7 @@ interface FreeAgent {
   name: string;
   team: string;
   position: string;
+  headshot?: string;
   stats: Record<string, string>;
   comparison: Record<string, { diff: string; isUpgrade: boolean; isEqual: boolean }>;
 }
@@ -19,6 +20,7 @@ interface PositionSlot {
     team: string;
     position: string;
     status: string | null;
+    headshot?: string;
     stats: Record<string, string>;
   };
   top_free_agents: FreeAgent[];
@@ -43,6 +45,13 @@ export default function PositionComparison({ slot, statNames }: PositionComparis
           <span className="text-sm font-medium text-purple-400 w-8">
             {slot.roster_position}
           </span>
+          {slot.player.headshot ? (
+            <img src={slot.player.headshot} alt="" className="h-7 w-7 rounded-full" />
+          ) : (
+            <div className="h-7 w-7 rounded-full bg-gray-800 flex items-center justify-center text-xs text-gray-500">
+              {slot.player.name?.charAt(0)}
+            </div>
+          )}
           <span className="font-medium text-white">{slot.player.name}</span>
           <span className="text-xs text-gray-500">
             {slot.player.team} - {slot.player.position}
@@ -82,6 +91,13 @@ export default function PositionComparison({ slot, statNames }: PositionComparis
                 <td className="px-4 py-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-500">Current</span>
+                    {slot.player.headshot ? (
+                      <img src={slot.player.headshot} alt="" className="h-5 w-5 rounded-full" />
+                    ) : (
+                      <div className="h-5 w-5 rounded-full bg-gray-800 flex items-center justify-center text-[9px] text-gray-500">
+                        {slot.player.name?.charAt(0)}
+                      </div>
+                    )}
                     <span className="font-medium text-white">{slot.player.name}</span>
                   </div>
                 </td>
@@ -98,6 +114,13 @@ export default function PositionComparison({ slot, statNames }: PositionComparis
                   <td className="px-4 py-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-gray-500">#{i + 1}</span>
+                      {fa.headshot ? (
+                        <img src={fa.headshot} alt="" className="h-5 w-5 rounded-full" />
+                      ) : (
+                        <div className="h-5 w-5 rounded-full bg-gray-800 flex items-center justify-center text-[9px] text-gray-500">
+                          {fa.name?.charAt(0)}
+                        </div>
+                      )}
                       <span className="text-gray-200">{fa.name}</span>
                       <span className="text-xs text-gray-500">{fa.team}</span>
                     </div>
