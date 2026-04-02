@@ -1,6 +1,6 @@
 import { type NextAuthOptions } from "next-auth";
 
-const DEPLOY_VERSION = "v8-fix-jwt-expiry";
+const DEPLOY_VERSION = "v9-idtoken-true";
 
 console.log(`[fantasy-auth] Loading auth config ${DEPLOY_VERSION}`, {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
@@ -38,7 +38,7 @@ export const authOptions: NextAuthOptions = {
         token_endpoint_auth_method: "client_secret_basic",
       },
       checks: ["state"],
-      idToken: false,
+      idToken: true,
       profile(profile) {
         return {
           id: profile.sub,
