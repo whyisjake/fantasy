@@ -57,11 +57,11 @@ export async function getScoreboard(accessToken: string, leagueKey: string) {
   return data;
 }
 
-// Get team roster
+// Get team roster with season stats
 export async function getTeamRoster(accessToken: string, teamKey: string) {
   const data = await yahooFetch({
     accessToken,
-    path: `/team/${teamKey}/roster/players/stats`,
+    path: `/team/${teamKey}/roster/players/stats;type=season`,
   });
   return data;
 }
@@ -95,7 +95,7 @@ export async function searchPlayers(
   if (position) {
     path += `;position=${position}`;
   }
-  path += "/stats";
+  path += "/stats;type=season";
   const data = await yahooFetch({ accessToken, path });
   return data;
 }
@@ -112,7 +112,7 @@ export async function getFreeAgents(
   if (position) {
     path += `;position=${position}`;
   }
-  path += "/stats";
+  path += "/stats;type=season";
   const data = await yahooFetch({ accessToken, path });
   return data;
 }
