@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import { searchPlayers, getFreeAgents } from "@/lib/yahoo-api";
+import { searchPlayers, getFreeAgents, type StatCoverage } from "@/lib/yahoo-api";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
   const position = searchParams.get("position") || undefined;
   const freeAgents = searchParams.get("freeAgents") === "true";
   const start = parseInt(searchParams.get("start") || "0");
+  const coverage = (searchParams.get("coverage") || "season") as StatCoverage;
 
   if (!leagueKey) {
     return NextResponse.json({ error: "leagueKey required" }, { status: 400 });
@@ -24,9 +25,9 @@ export async function GET(request: NextRequest) {
   try {
     let data;
     if (freeAgents) {
-      data = await getFreeAgents(session.accessToken, leagueKey, position, start);
+      data = await getFreeAgents(session.accessToken, leagueKey, position, start, 25, coverage);
     } else if (query) {
-      data = await searchPlayers(session.accessToken, leagueKey, query, position);
+      data = await searchPlayers(session.accessToken, leagueKey, query, position, coverage);
     } else {
       return NextResponse.json({ error: "q or freeAgents param required" }, { status: 400 });
     }

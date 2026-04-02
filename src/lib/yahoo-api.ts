@@ -57,11 +57,24 @@ export async function getScoreboard(accessToken: string, leagueKey: string) {
   return data;
 }
 
-// Get team roster with season stats
-export async function getTeamRoster(accessToken: string, teamKey: string) {
+// Stat coverage types
+export type StatCoverage = "season" | "lastmonth" | "lastweek";
+
+function statCoveragePath(coverage: StatCoverage = "season"): string {
+  if (coverage === "lastmonth") return "/stats;type=lastmonth";
+  if (coverage === "lastweek") return "/stats;type=lastweek";
+  return "/stats;type=season";
+}
+
+// Get team roster with stats
+export async function getTeamRoster(
+  accessToken: string,
+  teamKey: string,
+  coverage: StatCoverage = "season"
+) {
   const data = await yahooFetch({
     accessToken,
-    path: `/team/${teamKey}/roster/players/stats;type=season`,
+    path: `/team/${teamKey}/roster/players${statCoveragePath(coverage)}`,
   });
   return data;
 }
@@ -89,13 +102,14 @@ export async function searchPlayers(
   accessToken: string,
   leagueKey: string,
   query: string,
-  position?: string
+  position?: string,
+  coverage: StatCoverage = "season"
 ) {
   let path = `/league/${leagueKey}/players;search=${encodeURIComponent(query)}`;
   if (position) {
     path += `;position=${position}`;
   }
-  path += "/stats;type=season";
+  path += statCoveragePath(coverage);
   const data = await yahooFetch({ accessToken, path });
   return data;
 }
@@ -106,13 +120,14 @@ export async function getFreeAgents(
   leagueKey: string,
   position?: string,
   start = 0,
-  count = 25
+  count = 25,
+  coverage: StatCoverage = "season"
 ) {
   let path = `/league/${leagueKey}/players;status=FA;start=${start};count=${count}`;
   if (position) {
     path += `;position=${position}`;
   }
-  path += "/stats;type=season";
+  path += statCoveragePath(coverage);
   const data = await yahooFetch({ accessToken, path });
   return data;
 }

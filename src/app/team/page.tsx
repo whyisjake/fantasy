@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useLeague } from "@/lib/league-context";
 import LeagueSelector from "@/components/layout/league-selector";
 import RosterTable from "@/components/team/roster-table";
+import CoverageSelector, { type StatCoverageOption } from "@/components/ui/coverage-selector";
 
 export default function TeamPage() {
   const { data: session } = useSession();
@@ -12,19 +13,20 @@ export default function TeamPage() {
   const [roster, setRoster] = useState([]);
   const [loading, setLoading] = useState(false);
   const [teamName, setTeamName] = useState("");
+  const [coverage, setCoverage] = useState<StatCoverageOption>("season");
 
   useEffect(() => {
     if (!teamKey) return;
 
     setLoading(true);
-    fetch(`/api/yahoo/team?teamKey=${teamKey}`)
+    fetch(`/api/yahoo/team?teamKey=${teamKey}&coverage=${coverage}`)
       .then((r) => r.json())
       .then((data) => {
         setRoster(data.roster || []);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [teamKey]);
+  }, [teamKey, coverage]);
 
   useEffect(() => {
     if (!leagueKey) return;
@@ -54,7 +56,10 @@ export default function TeamPage() {
             <p className="text-sm text-gray-400">{teamName}</p>
           )}
         </div>
-        <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
+        <div className="flex items-center gap-3">
+          <CoverageSelector value={coverage} onChange={setCoverage} />
+          <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
+        </div>
       </div>
 
       <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">

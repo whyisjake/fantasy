@@ -6,6 +6,7 @@ import { useLeague } from "@/lib/league-context";
 import LeagueSelector from "@/components/layout/league-selector";
 import PlayerSearch from "@/components/players/player-search";
 import PlayerStatsTable from "@/components/players/player-stats-table";
+import CoverageSelector, { type StatCoverageOption } from "@/components/ui/coverage-selector";
 import type { PlayerWithStats } from "@/types/player";
 
 export default function PlayersPage() {
@@ -13,6 +14,7 @@ export default function PlayersPage() {
   const { leagueKey, setLeagueKey, statCategories } = useLeague();
   const [players, setPlayers] = useState<PlayerWithStats[]>([]);
   const [loading, setLoading] = useState(false);
+  const [coverage, setCoverage] = useState<StatCoverageOption>("season");
   const [message, setMessage] = useState("");
   const [currentPosition, setCurrentPosition] = useState<string | undefined>();
 
@@ -23,7 +25,7 @@ export default function PlayersPage() {
       setMessage("");
       setCurrentPosition(position);
 
-      let url = `/api/yahoo/players?leagueKey=${leagueKey}&q=${encodeURIComponent(query)}`;
+      let url = `/api/yahoo/players?leagueKey=${leagueKey}&q=${encodeURIComponent(query)}&coverage=${coverage}`;
       if (position) url += `&position=${position}`;
 
       fetch(url)
@@ -35,7 +37,7 @@ export default function PlayersPage() {
         .catch(console.error)
         .finally(() => setLoading(false));
     },
-    [leagueKey]
+    [leagueKey, coverage]
   );
 
   const handleFreeAgents = useCallback(
@@ -45,7 +47,7 @@ export default function PlayersPage() {
       setMessage("");
       setCurrentPosition(position);
 
-      let url = `/api/yahoo/players?leagueKey=${leagueKey}&freeAgents=true`;
+      let url = `/api/yahoo/players?leagueKey=${leagueKey}&freeAgents=true&coverage=${coverage}`;
       if (position) url += `&position=${position}`;
 
       fetch(url)
@@ -57,7 +59,7 @@ export default function PlayersPage() {
         .catch(console.error)
         .finally(() => setLoading(false));
     },
-    [leagueKey]
+    [leagueKey, coverage]
   );
 
   const handleAdd = useCallback(
@@ -83,7 +85,7 @@ export default function PlayersPage() {
         setMessage("Failed to add player.");
       }
     },
-    [leagueKey, players]
+    [leagueKey, players, coverage]
   );
 
   // Determine player type from position filter
@@ -106,7 +108,10 @@ export default function PlayersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Players</h1>
-        <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
+        <div className="flex items-center gap-3">
+          <CoverageSelector value={coverage} onChange={setCoverage} />
+          <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
+        </div>
       </div>
 
       {!leagueKey ? (

@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
-import { getUserTeams, getTeamRoster } from "@/lib/yahoo-api";
+import { getUserTeams, getTeamRoster, type StatCoverage } from "@/lib/yahoo-api";
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const leagueKey = searchParams.get("leagueKey");
   const teamKey = searchParams.get("teamKey");
+  const coverage = (searchParams.get("coverage") || "season") as StatCoverage;
 
   if (!leagueKey && !teamKey) {
     return NextResponse.json(
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
   try {
     // If teamKey is provided, get the roster directly
     if (teamKey) {
-      const data = await getTeamRoster(session.accessToken, teamKey);
+      const data = await getTeamRoster(session.accessToken, teamKey, coverage);
       const roster = parseRoster(data);
       return NextResponse.json({ roster });
     }
@@ -107,6 +108,7 @@ function parseRoster(data: Record<string, unknown>) {
               }
               if ("status" in obj) playerInfo.status = obj.status;
               if ("status_full" in obj) playerInfo.status_full = obj.status_full;
+              if ("headshot" in obj) playerInfo.headshot = (obj.headshot as Record<string, unknown>)?.url;
             }
           }
         } else if (typeof element === "object" && element !== null) {

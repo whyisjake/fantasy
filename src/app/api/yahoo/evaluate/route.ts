@@ -258,6 +258,7 @@ function parseRosterForEval(data: Record<string, unknown>): PlayerWithStats[] {
               }
               if ("status" in obj) playerInfo.status = obj.status as string;
               if ("status_full" in obj) playerInfo.status_full = obj.status_full as string;
+              if ("headshot" in obj) playerInfo.headshot = (obj.headshot as Record<string, unknown>)?.url as string;
             }
           }
         } else if (typeof element === "object" && element !== null) {
