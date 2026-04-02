@@ -58,13 +58,21 @@ export function parseLeagueSettings(data: Record<string, unknown>): {
         const statObj = item as Record<string, unknown>;
         const stat = statObj?.stat as Record<string, unknown>;
         if (stat?.stat_id !== undefined) {
-          const posTypes = stat.position_types as Array<Record<string, unknown>> | undefined;
+          // Yahoo uses position_type as a direct string ("B" or "P")
+          // and stat_position_types as a nested array
+          const posType = stat.position_type as string | undefined;
+          const posTypes: string[] = posType ? [posType] : [];
+
+          // Skip display-only stats (like H/AB, IP) from scoring
+          const isDisplayOnly = stat.is_only_display_stat === "1";
+
           statCategories.push({
             stat_id: String(stat.stat_id),
             name: (stat.name as string) || "",
-            display_name: (stat.display_name as string) || "",
+            display_name: (stat.display_name as string) || (stat.abbr as string) || "",
             sort_order: (stat.sort_order as "0" | "1") || "1",
-            position_types: posTypes?.map((p) => p.position_type as string) || [],
+            position_types: posTypes,
+            is_display_only: isDisplayOnly,
           });
         }
       }
@@ -194,8 +202,11 @@ export function isPitcher(position: string): boolean {
 // Get the relevant stat categories for a player type
 export function getRelevantCategories(
   categories: StatCategory[],
-  type: "batting" | "pitching"
+  type: "batting" | "pitching",
+  excludeDisplayOnly = false
 ): StatCategory[] {
   const posType = type === "batting" ? "B" : "P";
-  return categories.filter((c) => c.position_types.includes(posType));
+  return categories.filter(
+    (c) => c.position_types.includes(posType) && (!excludeDisplayOnly || !c.is_display_only)
+  );
 }

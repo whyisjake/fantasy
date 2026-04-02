@@ -20,6 +20,7 @@ export interface StatCategory {
   display_name: string;
   sort_order: "0" | "1"; // "1" = higher is better, "0" = lower is better
   position_types: string[]; // ["B"] for batting, ["P"] for pitching
+  is_display_only?: boolean; // true for display-only stats not used in scoring
 }
 
 export interface ResolvedStats {

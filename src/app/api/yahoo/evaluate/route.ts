@@ -55,6 +55,9 @@ export async function GET(request: NextRequest) {
 
     const battingCats = getRelevantCategories(statCategories, "batting");
     const pitchingCats = getRelevantCategories(statCategories, "pitching");
+    // For comparisons, exclude display-only stats
+    const battingScoringCats = getRelevantCategories(statCategories, "batting", true);
+    const pitchingScoringCats = getRelevantCategories(statCategories, "pitching", true);
 
     // Identify positions to fetch free agents for
     const battingPositions = ["C", "1B", "2B", "3B", "SS", "OF"];
@@ -76,11 +79,11 @@ export async function GET(request: NextRequest) {
       faMap.set(position, players);
     }
 
-    // Build evaluation per roster slot
+    // Build evaluation per roster slot (use scoring cats for comparison, all cats for display)
     const battingEval = buildPositionEval(
       roster.filter((p) => !isPitcher(p.position)),
       faMap,
-      battingCats,
+      battingScoringCats,
       statMap,
       battingPositions
     );
@@ -88,7 +91,7 @@ export async function GET(request: NextRequest) {
     const pitchingEval = buildPositionEval(
       roster.filter((p) => isPitcher(p.position)),
       faMap,
-      pitchingCats,
+      pitchingScoringCats,
       statMap,
       pitchingPositions
     );
