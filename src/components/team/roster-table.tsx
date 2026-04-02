@@ -2,6 +2,7 @@
 
 import type { PlayerWithStats, StatCategory } from "@/types/player";
 import { getStatValue, isPitcher, getRelevantCategories } from "@/lib/stat-mapping";
+import StatHeader from "@/components/ui/stat-header";
 
 interface RosterTableProps {
   players: PlayerWithStats[];
@@ -79,9 +80,7 @@ function RosterSection({
             <th className="px-2 py-2 w-16">Elig</th>
             <th className="px-2 py-2 w-16">Status</th>
             {categories.map((cat) => (
-              <th key={cat.stat_id} className="px-2 py-2 w-14 text-right" title={cat.name}>
-                {cat.display_name}
-              </th>
+              <StatHeader key={cat.stat_id} category={cat} />
             ))}
           </tr>
         </thead>

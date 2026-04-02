@@ -11,7 +11,8 @@ export interface PlayerBase {
 export interface PlayerWithStats extends PlayerBase {
   stats?: Array<{ stat: { stat_id: string; value: string } }>;
   roster_position?: string;
-  ownership?: Record<string, unknown>;
+  percent_owned?: number;
+  ownership_change?: number; // positive = adds, negative = drops
 }
 
 export interface StatCategory {

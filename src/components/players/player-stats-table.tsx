@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import type { PlayerWithStats, StatCategory } from "@/types/player";
 import { getStatValue, isPitcher, getRelevantCategories } from "@/lib/stat-mapping";
+import StatHeader from "@/components/ui/stat-header";
 
 interface PlayerStatsTableProps {
   players: PlayerWithStats[];
@@ -131,20 +132,15 @@ function StatsTable({
             <th className="px-3 py-2 sticky left-0 bg-gray-950 z-10">Player</th>
             <th className="px-2 py-2 w-12">Team</th>
             <th className="px-2 py-2 w-14">Pos</th>
+            <th className="px-2 py-2 w-14 text-right" title="Percent Owned">%Own</th>
             {categories.map((cat) => (
-              <th
+              <StatHeader
                 key={cat.stat_id}
-                className="px-2 py-2 w-14 text-right cursor-pointer hover:text-purple-400 transition select-none"
-                onClick={() => onSort(cat.stat_id, cat.sort_order === "0")}
-                title={cat.name}
-              >
-                {cat.display_name}
-                {sortStatId === cat.stat_id && (
-                  <span className="ml-0.5 text-purple-400">
-                    {sortAsc ? "\u25B2" : "\u25BC"}
-                  </span>
-                )}
-              </th>
+                category={cat}
+                sortStatId={sortStatId}
+                sortAsc={sortAsc}
+                onSort={onSort}
+              />
             ))}
             {onAdd && <th className="px-2 py-2 w-12" />}
           </tr>
@@ -179,6 +175,24 @@ function StatsTable({
               </td>
               <td className="px-2 py-2 text-gray-400">{player.team}</td>
               <td className="px-2 py-2 text-purple-400">{player.position}</td>
+              <td className="px-2 py-2 text-right text-gray-400 tabular-nums">
+                {player.percent_owned !== undefined ? (
+                  <div className="flex items-center justify-end gap-1">
+                    <span>{player.percent_owned}%</span>
+                    {player.ownership_change !== undefined && player.ownership_change !== 0 && (
+                      <span
+                        className={`text-[10px] ${
+                          player.ownership_change > 0 ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {player.ownership_change > 0 ? `+${player.ownership_change}` : player.ownership_change}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  "-"
+                )}
+              </td>
               {categories.map((cat) => (
                 <td key={cat.stat_id} className="px-2 py-2 text-right text-gray-300 tabular-nums">
                   {getStatValue(player.stats, cat.stat_id)}

@@ -55,30 +55,56 @@ function parsePlayers(data: Record<string, unknown>) {
     while (players?.[String(idx)]) {
       const player = players[String(idx)] as Record<string, unknown>;
       const playerData = player?.player as Array<unknown>;
-      const info = playerData?.[0] as Array<unknown>;
-      const statsData = playerData?.[1] as Record<string, unknown>;
 
-      let playerInfo: Record<string, unknown> = {};
+      const playerInfo: Record<string, unknown> = {};
 
-      for (const item of info || []) {
-        if (typeof item === "object" && item !== null) {
-          const obj = item as Record<string, unknown>;
-          if ("player_key" in obj) playerInfo.player_key = obj.player_key;
-          if ("name" in obj) playerInfo.name = (obj.name as Record<string, unknown>)?.full;
-          if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr;
-          if ("display_position" in obj) playerInfo.position = obj.display_position;
-          if ("status" in obj) playerInfo.status = obj.status;
-          if ("status_full" in obj) playerInfo.status_full = obj.status_full;
-          if ("headshot" in obj) {
-            playerInfo.headshot = (obj.headshot as Record<string, unknown>)?.url;
+      for (let i = 0; i < (playerData?.length || 0); i++) {
+        const element = playerData[i];
+
+        if (Array.isArray(element)) {
+          for (const item of element) {
+            if (typeof item === "object" && item !== null) {
+              const obj = item as Record<string, unknown>;
+              if ("player_key" in obj) playerInfo.player_key = obj.player_key;
+              if ("name" in obj) playerInfo.name = (obj.name as Record<string, unknown>)?.full;
+              if ("editorial_team_abbr" in obj) playerInfo.team = obj.editorial_team_abbr;
+              if ("display_position" in obj) playerInfo.position = obj.display_position;
+              if ("status" in obj) playerInfo.status = obj.status;
+              if ("status_full" in obj) playerInfo.status_full = obj.status_full;
+              if ("headshot" in obj) {
+                playerInfo.headshot = (obj.headshot as Record<string, unknown>)?.url;
+              }
+              if ("percent_owned" in obj) {
+                const po = obj.percent_owned as Array<Record<string, unknown>> | Record<string, unknown>;
+                // Yahoo returns percent_owned as nested structure
+                if (Array.isArray(po)) {
+                  const owned = po.find((p) => "value" in p);
+                  if (owned) playerInfo.percent_owned = Number(owned.value) || 0;
+                } else if (typeof po === "object") {
+                  playerInfo.percent_owned = Number((po as Record<string, unknown>).value) || 0;
+                }
+              }
+              if ("ownership" in obj) {
+                const ow = obj.ownership as Record<string, unknown>;
+                if (ow?.percent_owned !== undefined) {
+                  playerInfo.percent_owned = Number(ow.percent_owned) || 0;
+                }
+                // ownership_change = adds - drops (positive means trending up)
+                const adds = Number(ow?.adds) || 0;
+                const drops = Number(ow?.drops) || 0;
+                if (adds || drops) {
+                  playerInfo.ownership_change = adds - drops;
+                }
+              }
+            }
           }
-          if ("ownership" in obj) playerInfo.ownership = obj.ownership;
+        } else if (typeof element === "object" && element !== null) {
+          const obj = element as Record<string, unknown>;
+          if (obj.player_stats) {
+            const ps = obj.player_stats as Record<string, unknown>;
+            playerInfo.stats = ps?.stats;
+          }
         }
-      }
-
-      if (statsData?.player_stats) {
-        const ps = statsData.player_stats as Record<string, unknown>;
-        playerInfo.stats = ps?.stats;
       }
 
       playerList.push(playerInfo);
