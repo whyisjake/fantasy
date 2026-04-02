@@ -17,7 +17,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-56 flex-col bg-surface px-3 py-6">
+    <aside className="flex w-56 flex-col border-r border-default bg-surface px-3 py-6">
       <div className="mb-8 px-3">
         <h1 className="text-lg font-bold text-primary">Fantasy Manager</h1>
         <p className="text-xs text-muted">MLB 2026</p>
