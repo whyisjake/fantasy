@@ -7,58 +7,21 @@ export const authOptions: NextAuthOptions = {
       id: "yahoo",
       name: "Yahoo",
       type: "oauth",
+      wellKnown:
+        "https://api.login.yahoo.com/.well-known/openid-configuration",
       authorization: {
-        url: "https://api.login.yahoo.com/oauth2/request_auth",
-        params: {
-          scope: "openid fspt-r fspt-w",
-          redirect_uri:
-            process.env.NEXTAUTH_URL + "/api/auth/callback/yahoo",
-        },
+        params: { scope: "openid fspt-r fspt-w" },
       },
-      token: {
-        url: "https://api.login.yahoo.com/oauth2/get_token",
-        async request({ params, provider }) {
-          const body = new URLSearchParams({
-            grant_type: "authorization_code",
-            code: params.code as string,
-            redirect_uri: provider.callbackUrl,
-            client_id: process.env.YAHOO_CLIENT_ID!,
-            client_secret: process.env.YAHOO_CLIENT_SECRET!,
-          });
-
-          const response = await fetch(
-            "https://api.login.yahoo.com/oauth2/get_token",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-                Authorization: `Basic ${Buffer.from(
-                  `${process.env.YAHOO_CLIENT_ID}:${process.env.YAHOO_CLIENT_SECRET}`
-                ).toString("base64")}`,
-              },
-              body,
-            }
-          );
-
-          const tokens = await response.json();
-
-          if (!response.ok) {
-            console.error("Yahoo token error:", tokens);
-            throw new Error(
-              `Yahoo token exchange failed: ${JSON.stringify(tokens)}`
-            );
-          }
-
-          return { tokens };
-        },
-      },
-      userinfo: "https://api.login.yahoo.com/openid/v1/userinfo",
       clientId: process.env.YAHOO_CLIENT_ID,
       clientSecret: process.env.YAHOO_CLIENT_SECRET,
+      client: {
+        token_endpoint_auth_method: "client_secret_basic",
+      },
+      idToken: true,
       profile(profile) {
         return {
           id: profile.sub,
-          name: profile.name || profile.nickname,
+          name: profile.name || profile.nickname || profile.preferred_username,
           email: profile.email,
           image: profile.picture,
         };
