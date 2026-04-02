@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const leagueKey = searchParams.get("leagueKey");
   let teamKey = searchParams.get("teamKey");
+  const deepScan = searchParams.get("deepScan") === "true";
 
   if (!leagueKey) {
     return NextResponse.json({ error: "leagueKey required" }, { status: 400 });
@@ -63,11 +64,21 @@ export async function GET(request: NextRequest) {
     const battingPositions = ["C", "1B", "2B", "3B", "SS", "OF"];
     const pitchingPositions = ["SP", "RP"];
 
-    // Fetch top free agents per position in parallel
+    // Fetch free agents per position in parallel
+    // deepScan: fetch 25 and re-rank by league scoring; default: Yahoo's top 5
+    const faCount = deepScan ? 25 : 5;
     const faPromises = [...battingPositions, ...pitchingPositions].map(async (pos) => {
       try {
-        const data = await getFreeAgents(session.accessToken, leagueKey, pos, 0, 5);
-        return { position: pos, players: parseFreeAgents(data) };
+        const data = await getFreeAgents(session.accessToken, leagueKey, pos, 0, faCount);
+        let players = parseFreeAgents(data);
+
+        if (deepScan && players.length > 0) {
+          // Re-rank by league scoring categories
+          const cats = battingPositions.includes(pos) ? battingScoringCats : pitchingScoringCats;
+          players = rerankByLeagueScoring(players, cats, statMap);
+        }
+
+        return { position: pos, players: players.slice(0, 5) };
       } catch {
         return { position: pos, players: [] };
       }
@@ -137,6 +148,7 @@ export async function GET(request: NextRequest) {
     }).filter(Boolean);
 
     const response = {
+      deep_scan: deepScan,
       league: {
         key: leagueKey,
         scoring_categories: {
@@ -455,4 +467,30 @@ function buildReason(
   }
 
   return parts.join(" ") || `${faName} is a comparable option to ${currentName}`;
+}
+
+// Re-rank free agents by league scoring categories instead of Yahoo's default rank
+function rerankByLeagueScoring(
+  players: PlayerWithStats[],
+  categories: StatCategory[],
+  statMap: Map<string, StatCategory>
+): PlayerWithStats[] {
+  return [...players].sort((a, b) => {
+    let aScore = 0;
+    let bScore = 0;
+
+    for (const cat of categories) {
+      const aVal = parseFloat(getStatValue(a.stats, cat.stat_id));
+      const bVal = parseFloat(getStatValue(b.stats, cat.stat_id));
+      if (isNaN(aVal) && isNaN(bVal)) continue;
+
+      const higher = isHigherBetter(cat.stat_id, statMap);
+
+      // Normalize: for each category, compare relative to the group
+      if (!isNaN(aVal)) aScore += higher ? aVal : -aVal;
+      if (!isNaN(bVal)) bScore += higher ? bVal : -bVal;
+    }
+
+    return bScore - aScore; // highest score first
+  });
 }

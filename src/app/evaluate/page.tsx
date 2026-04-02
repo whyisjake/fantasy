@@ -26,19 +26,34 @@ interface EvalResponse {
   };
 }
 
+const DEEP_SCAN_KEY = "fantasy-deep-scan";
+
 export default function EvaluatePage() {
   const { data: session } = useSession();
   const { leagueKey, setLeagueKey } = useLeague();
   const [evalData, setEvalData] = useState<EvalResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [deepScan, setDeepScan] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(DEEP_SCAN_KEY) === "true";
+  });
+
+  const toggleDeepScan = () => {
+    const next = !deepScan;
+    setDeepScan(next);
+    localStorage.setItem(DEEP_SCAN_KEY, String(next));
+  };
 
   useEffect(() => {
     if (!leagueKey) return;
 
     setLoading(true);
     setError("");
-    fetch(`/api/yahoo/evaluate?leagueKey=${leagueKey}`)
+    const params = new URLSearchParams({ leagueKey });
+    if (deepScan) params.set("deepScan", "true");
+
+    fetch(`/api/yahoo/evaluate?${params}`)
       .then((r) => {
         if (!r.ok) throw new Error("Failed to evaluate");
         return r.json();
@@ -46,7 +61,7 @@ export default function EvaluatePage() {
       .then(setEvalData)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [leagueKey]);
+  }, [leagueKey, deepScan]);
 
   if (!session) {
     return (
@@ -65,7 +80,21 @@ export default function EvaluatePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Evaluate Roster</h1>
-        <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleDeepScan}
+            className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+              deepScan
+                ? "bg-purple-600/20 text-purple-300 border border-purple-600/50"
+                : "bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700"
+            }`}
+            title="Fetch 25 free agents per position and re-rank by your league's scoring categories"
+          >
+            <span className={`inline-block w-2 h-2 rounded-full ${deepScan ? "bg-purple-400" : "bg-gray-600"}`} />
+            Deep Scan
+          </button>
+          <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
+        </div>
       </div>
 
       {!leagueKey && (
