@@ -5,9 +5,11 @@ interface RecommendedMove {
   add_player_key: string;
   add_name: string;
   add_position: string;
+  add_headshot?: string;
   drop_player_key: string;
   drop_name: string;
   drop_position: string;
+  drop_headshot?: string;
   improved_categories: string[];
   declined_categories: string[];
   reason: string;
@@ -33,14 +35,36 @@ export default function RecommendationCard({ move, index }: RecommendationCardPr
       </div>
 
       <div className="flex items-center gap-3 mb-3">
-        <div className="flex-1">
-          <p className="text-xs text-red-400 mb-0.5">Drop</p>
-          <p className="font-medium text-secondary">{move.drop_name}</p>
+        <div className="flex-1 flex items-center gap-2">
+          <div>
+            {move.drop_headshot ? (
+              <img src={move.drop_headshot} alt="" className="h-8 w-8 rounded-full" />
+            ) : (
+              <div className="h-8 w-8 rounded-full bg-surface-secondary flex items-center justify-center text-xs text-muted">
+                {move.drop_name?.charAt(0)}
+              </div>
+            )}
+          </div>
+          <div>
+            <p className="text-xs text-red-400 mb-0.5">Drop</p>
+            <p className="font-medium text-secondary">{move.drop_name}</p>
+          </div>
         </div>
         <span className="text-muted">&rarr;</span>
-        <div className="flex-1">
-          <p className="text-xs text-green-400 mb-0.5">Add</p>
-          <p className="font-medium text-primary">{move.add_name}</p>
+        <div className="flex-1 flex items-center gap-2">
+          <div>
+            {move.add_headshot ? (
+              <img src={move.add_headshot} alt="" className="h-8 w-8 rounded-full" />
+            ) : (
+              <div className="h-8 w-8 rounded-full bg-surface-secondary flex items-center justify-center text-xs text-muted">
+                {move.add_name?.charAt(0)}
+              </div>
+            )}
+          </div>
+          <div>
+            <p className="text-xs text-green-400 mb-0.5">Add</p>
+            <p className="font-medium text-primary">{move.add_name}</p>
+          </div>
         </div>
       </div>
 
