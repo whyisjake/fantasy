@@ -1,0 +1,65 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useLeague } from "@/lib/league-context";
+import LeagueSelector from "@/components/layout/league-selector";
+import RosterTable from "@/components/team/roster-table";
+
+export default function TeamPage() {
+  const { data: session } = useSession();
+  const { leagueKey, teamKey, setLeagueKey } = useLeague();
+  const [roster, setRoster] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [teamName, setTeamName] = useState("");
+
+  useEffect(() => {
+    if (!teamKey) return;
+
+    setLoading(true);
+    fetch(`/api/yahoo/team?teamKey=${teamKey}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setRoster(data.roster || []);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [teamKey]);
+
+  useEffect(() => {
+    if (!leagueKey) return;
+
+    fetch(`/api/yahoo/team?leagueKey=${leagueKey}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.teamName) setTeamName(data.teamName);
+      })
+      .catch(console.error);
+  }, [leagueKey]);
+
+  if (!session) {
+    return (
+      <p className="text-center text-gray-500 py-16">
+        Sign in to view your team.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">My Team</h1>
+          {teamName && (
+            <p className="text-sm text-gray-400">{teamName}</p>
+          )}
+        </div>
+        <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
+      </div>
+
+      <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+        <RosterTable players={roster} loading={loading} />
+      </div>
+    </div>
+  );
+}

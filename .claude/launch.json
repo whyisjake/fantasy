@@ -1,0 +1,15 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "/Users/whyisjake/.nvm/versions/node/v22.16.0/bin/npx",
+      "runtimeArgs": ["next", "dev"],
+      "port": 3000,
+      "autoPort": false,
+      "env": {
+        "PATH": "/Users/whyisjake/.nvm/versions/node/v22.16.0/bin:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+
+interface League {
+  league_key: string;
+  name: string;
+  season: string;
+  num_teams: number;
+}
+
+interface LeagueSelectorProps {
+  onSelect: (leagueKey: string) => void;
+  selected?: string;
+}
+
+export default function LeagueSelector({
+  onSelect,
+  selected,
+}: LeagueSelectorProps) {
+  const { data: session } = useSession();
+  const [leagues, setLeagues] = useState<League[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!session?.accessToken) return;
+
+    fetch("/api/yahoo/leagues")
+      .then((res) => res.json())
+      .then((data) => {
+        setLeagues(data.leagues || []);
+        if (data.leagues?.length > 0 && !selected) {
+          onSelect(data.leagues[0].league_key);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [session?.accessToken, onSelect, selected]);
+
+  if (loading) {
+    return (
+      <div className="h-9 w-48 animate-pulse rounded bg-gray-800" />
+    );
+  }
+
+  if (leagues.length === 0) {
+    return (
+      <p className="text-sm text-gray-500">No MLB leagues found</p>
+    );
+  }
+
+  return (
+    <select
+      value={selected || ""}
+      onChange={(e) => onSelect(e.target.value)}
+      className="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-200 focus:border-purple-500 focus:outline-none"
+    >
+      {leagues.map((league) => (
+        <option key={league.league_key} value={league.league_key}>
+          {league.name} ({league.season})
+        </option>
+      ))}
+    </select>
+  );
+}
