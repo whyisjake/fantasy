@@ -152,13 +152,13 @@ export async function GET(request: NextRequest) {
       league: {
         key: leagueKey,
         scoring_categories: {
-          batting: battingCats.map((c) => ({
+          batting: battingScoringCats.map((c) => ({
             stat_id: c.stat_id,
             name: c.display_name,
             display_name: c.name,
             higher_is_better: c.sort_order === "1",
           })),
-          pitching: pitchingCats.map((c) => ({
+          pitching: pitchingScoringCats.map((c) => ({
             stat_id: c.stat_id,
             name: c.display_name,
             display_name: c.name,
