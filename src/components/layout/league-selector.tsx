@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { getSavedLeagueKey } from "@/lib/league-context";
 
 interface League {
   league_key: string;
@@ -29,9 +30,17 @@ export default function LeagueSelector({
     fetch("/api/yahoo/leagues")
       .then((res) => res.json())
       .then((data) => {
-        setLeagues(data.leagues || []);
-        if (data.leagues?.length > 0 && !selected) {
-          onSelect(data.leagues[0].league_key);
+        const leagueList = (data.leagues || []) as League[];
+
+        // Sort by season descending (newest first)
+        leagueList.sort((a, b) => Number(b.season) - Number(a.season));
+        setLeagues(leagueList);
+
+        if (leagueList.length > 0 && !selected) {
+          // Prefer saved league, then default to most recent
+          const saved = getSavedLeagueKey();
+          const match = saved && leagueList.find((l) => l.league_key === saved);
+          onSelect(match ? match.league_key : leagueList[0].league_key);
         }
       })
       .catch(console.error)

@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useMemo, useEffect, type ReactNode } from "react";
 import type { StatCategory } from "@/types/player";
 import { buildStatMap } from "@/lib/stat-mapping";
+
+const STORAGE_KEY = "fantasy-selected-league";
 
 interface LeagueContextType {
   leagueKey: string | null;
@@ -23,7 +25,10 @@ const LeagueContext = createContext<LeagueContextType>({
 });
 
 export function LeagueProvider({ children }: { children: ReactNode }) {
-  const [leagueKey, setLeagueKeyState] = useState<string | null>(null);
+  const [leagueKey, setLeagueKeyState] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(STORAGE_KEY);
+  });
   const [teamKey, setTeamKey] = useState<string | null>(null);
   const [statCategories, setStatCategories] = useState<StatCategory[] | null>(null);
 
@@ -34,6 +39,7 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
 
   const setLeagueKey = useCallback((key: string) => {
     setLeagueKeyState(key);
+    localStorage.setItem(STORAGE_KEY, key);
 
     // Fetch user's team and league settings in parallel
     fetch(`/api/yahoo/team?leagueKey=${key}`)
@@ -51,6 +57,14 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
       .catch(console.error);
   }, []);
 
+  // On mount, if we have a saved league key, fetch its data
+  useEffect(() => {
+    if (leagueKey) {
+      setLeagueKey(leagueKey);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <LeagueContext.Provider
       value={{ leagueKey, teamKey, statCategories, statMap, setLeagueKey, setTeamKey }}
@@ -62,4 +76,9 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
 
 export function useLeague() {
   return useContext(LeagueContext);
+}
+
+export function getSavedLeagueKey(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(STORAGE_KEY);
 }
