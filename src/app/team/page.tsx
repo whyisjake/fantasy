@@ -8,7 +8,7 @@ import RosterTable from "@/components/team/roster-table";
 
 export default function TeamPage() {
   const { data: session } = useSession();
-  const { leagueKey, teamKey, setLeagueKey } = useLeague();
+  const { leagueKey, teamKey, setLeagueKey, statCategories } = useLeague();
   const [roster, setRoster] = useState([]);
   const [loading, setLoading] = useState(false);
   const [teamName, setTeamName] = useState("");
@@ -58,7 +58,7 @@ export default function TeamPage() {
       </div>
 
       <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-        <RosterTable players={roster} loading={loading} />
+        <RosterTable players={roster} statCategories={statCategories} loading={loading} />
       </div>
     </div>
   );

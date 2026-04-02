@@ -5,30 +5,23 @@ import { useSession } from "next-auth/react";
 import { useLeague } from "@/lib/league-context";
 import LeagueSelector from "@/components/layout/league-selector";
 import PlayerSearch from "@/components/players/player-search";
-import PlayerCard from "@/components/players/player-card";
-
-interface Player {
-  player_key: string;
-  name: string;
-  team: string;
-  position: string;
-  status?: string;
-  status_full?: string;
-  headshot?: string;
-}
+import PlayerStatsTable from "@/components/players/player-stats-table";
+import type { PlayerWithStats } from "@/types/player";
 
 export default function PlayersPage() {
   const { data: session } = useSession();
-  const { leagueKey, setLeagueKey } = useLeague();
-  const [players, setPlayers] = useState<Player[]>([]);
+  const { leagueKey, setLeagueKey, statCategories } = useLeague();
+  const [players, setPlayers] = useState<PlayerWithStats[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [currentPosition, setCurrentPosition] = useState<string | undefined>();
 
   const handleSearch = useCallback(
     (query: string, position?: string) => {
       if (!leagueKey) return;
       setLoading(true);
       setMessage("");
+      setCurrentPosition(position);
 
       let url = `/api/yahoo/players?leagueKey=${leagueKey}&q=${encodeURIComponent(query)}`;
       if (position) url += `&position=${position}`;
@@ -50,6 +43,7 @@ export default function PlayersPage() {
       if (!leagueKey) return;
       setLoading(true);
       setMessage("");
+      setCurrentPosition(position);
 
       let url = `/api/yahoo/players?leagueKey=${leagueKey}&freeAgents=true`;
       if (position) url += `&position=${position}`;
@@ -92,6 +86,14 @@ export default function PlayersPage() {
     [leagueKey, players]
   );
 
+  // Determine player type from position filter
+  const playerType =
+    currentPosition === "SP" || currentPosition === "RP"
+      ? "pitching" as const
+      : currentPosition && currentPosition !== "All"
+      ? "batting" as const
+      : "all" as const;
+
   if (!session) {
     return (
       <p className="text-center text-gray-500 py-16">
@@ -117,27 +119,34 @@ export default function PlayersPage() {
             loading={loading}
           />
 
-          {message && (
-            <p className="text-sm text-gray-400">{message}</p>
-          )}
+          {message && <p className="text-sm text-gray-400">{message}</p>}
 
           {loading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-16 animate-pulse rounded-lg bg-gray-800" />
+            <div className="space-y-2">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="h-10 animate-pulse rounded bg-gray-800" />
               ))}
             </div>
-          ) : (
-            <div className="space-y-3">
-              {players.map((player) => (
-                <PlayerCard
-                  key={player.player_key}
-                  player={player}
-                  onAdd={handleAdd}
-                />
-              ))}
+          ) : players.length > 0 && statCategories ? (
+            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <PlayerStatsTable
+                players={players}
+                statCategories={statCategories}
+                playerType={playerType}
+                onAdd={handleAdd}
+              />
             </div>
-          )}
+          ) : players.length > 0 ? (
+            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <p className="text-sm text-gray-500 mb-4">Loading stat categories...</p>
+              <PlayerStatsTable
+                players={players}
+                statCategories={[]}
+                playerType={playerType}
+                onAdd={handleAdd}
+              />
+            </div>
+          ) : null}
         </>
       )}
     </div>

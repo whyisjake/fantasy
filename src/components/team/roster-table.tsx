@@ -1,24 +1,17 @@
 "use client";
 
-interface Player {
-  player_key: string;
-  name: string;
-  team: string;
-  position: string;
-  roster_position: string;
-  status?: string;
-  status_full?: string;
-  stats?: Array<{ stat: { stat_id: string; value: string } }>;
-}
+import type { PlayerWithStats, StatCategory } from "@/types/player";
+import { getStatValue, isPitcher, getRelevantCategories } from "@/lib/stat-mapping";
 
 interface RosterTableProps {
-  players: Player[];
+  players: PlayerWithStats[];
+  statCategories?: StatCategory[] | null;
   loading?: boolean;
 }
 
-const POSITION_ORDER = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "Util", "BN", "SP", "RP", "DL", "IL"];
+const POSITION_ORDER = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "Util", "BN", "SP", "RP", "DL", "IL"];
 
-export default function RosterTable({ players, loading }: RosterTableProps) {
+export default function RosterTable({ players, statCategories, loading }: RosterTableProps) {
   if (loading) {
     return (
       <div className="space-y-2">
@@ -30,9 +23,7 @@ export default function RosterTable({ players, loading }: RosterTableProps) {
   }
 
   if (players.length === 0) {
-    return (
-      <p className="text-center text-gray-500 py-8">No roster data available.</p>
-    );
+    return <p className="text-center text-gray-500 py-8">No roster data available.</p>;
   }
 
   const sorted = [...players].sort((a, b) => {
@@ -41,30 +32,71 @@ export default function RosterTable({ players, loading }: RosterTableProps) {
     return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
   });
 
+  // Split into batters and pitchers
+  const batters = sorted.filter((p) => !isPitcher(p.position));
+  const pitchers = sorted.filter((p) => isPitcher(p.position));
+
+  const battingCats = statCategories ? getRelevantCategories(statCategories, "batting") : [];
+  const pitchingCats = statCategories ? getRelevantCategories(statCategories, "pitching") : [];
+
+  return (
+    <div className="space-y-6">
+      {batters.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">
+            Batters
+          </h3>
+          <RosterSection players={batters} categories={battingCats} />
+        </div>
+      )}
+      {pitchers.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">
+            Pitchers
+          </h3>
+          <RosterSection players={pitchers} categories={pitchingCats} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RosterSection({
+  players,
+  categories,
+}: {
+  players: PlayerWithStats[];
+  categories: StatCategory[];
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-gray-800 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
             <th className="px-3 py-2 w-12">Pos</th>
-            <th className="px-3 py-2">Player</th>
-            <th className="px-3 py-2 w-16">Team</th>
-            <th className="px-3 py-2 w-20">Elig</th>
-            <th className="px-3 py-2 w-20">Status</th>
+            <th className="px-3 py-2 sticky left-0 bg-gray-950 z-10">Player</th>
+            <th className="px-2 py-2 w-12">Team</th>
+            <th className="px-2 py-2 w-16">Elig</th>
+            <th className="px-2 py-2 w-16">Status</th>
+            {categories.map((cat) => (
+              <th key={cat.stat_id} className="px-2 py-2 w-14 text-right" title={cat.name}>
+                {cat.display_name}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-800/50">
-          {sorted.map((player) => (
+          {players.map((player) => (
             <tr key={player.player_key} className="hover:bg-gray-800/30 transition">
               <td className="px-3 py-2 font-medium text-purple-400">
                 {player.roster_position}
               </td>
-              <td className="px-3 py-2 font-medium text-white">
+              <td className="px-3 py-2 font-medium text-white sticky left-0 bg-gray-950/95 z-10">
                 {player.name}
               </td>
-              <td className="px-3 py-2 text-gray-400">{player.team}</td>
-              <td className="px-3 py-2 text-gray-400">{player.position}</td>
-              <td className="px-3 py-2">
+              <td className="px-2 py-2 text-gray-400">{player.team}</td>
+              <td className="px-2 py-2 text-gray-400">{player.position}</td>
+              <td className="px-2 py-2">
                 {player.status && (
                   <span
                     className={`inline-flex rounded px-1.5 py-0.5 text-xs font-medium ${
@@ -80,6 +112,14 @@ export default function RosterTable({ players, loading }: RosterTableProps) {
                   </span>
                 )}
               </td>
+              {categories.map((cat) => (
+                <td
+                  key={cat.stat_id}
+                  className="px-2 py-2 text-right text-gray-300 tabular-nums"
+                >
+                  {getStatValue(player.stats, cat.stat_id)}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>

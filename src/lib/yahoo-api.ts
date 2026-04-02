@@ -117,6 +117,15 @@ export async function getFreeAgents(
   return data;
 }
 
+// Get league settings (stat categories, roster positions)
+export async function getLeagueSettings(accessToken: string, leagueKey: string) {
+  const data = await yahooFetch({
+    accessToken,
+    path: `/league/${leagueKey}/settings`,
+  });
+  return data;
+}
+
 // Get league transactions
 export async function getTransactions(
   accessToken: string,
