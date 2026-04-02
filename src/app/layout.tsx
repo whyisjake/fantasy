@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "@/components/auth/session-provider";
 import { LeagueProvider } from "@/lib/league-context";
+import { ThemeProvider } from "@/lib/theme-context";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 
@@ -30,16 +31,19 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      suppressHydrationWarning
     >
-      <body className="flex h-full bg-gray-900 text-gray-100">
+      <body className="flex h-full bg-surface-alt text-foreground">
         <AuthSessionProvider>
-          <LeagueProvider>
-            <Sidebar />
-            <div className="flex flex-1 flex-col overflow-hidden">
-              <Header />
-              <main className="flex-1 overflow-y-auto p-6">{children}</main>
-            </div>
-          </LeagueProvider>
+          <ThemeProvider>
+            <LeagueProvider>
+              <Sidebar />
+              <div className="flex flex-1 flex-col overflow-hidden">
+                <Header />
+                <main className="flex-1 overflow-y-auto p-6">{children}</main>
+              </div>
+            </LeagueProvider>
+          </ThemeProvider>
         </AuthSessionProvider>
       </body>
     </html>

@@ -39,7 +39,7 @@ export default function TransactionsPage() {
 
   if (!session) {
     return (
-      <p className="text-center text-gray-500 py-16">
+      <p className="text-center text-muted py-16">
         Sign in to view transactions.
       </p>
     );
@@ -48,12 +48,12 @@ export default function TransactionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Transactions</h1>
+        <h1 className="text-2xl font-bold text-primary">Transactions</h1>
         <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
       </div>
 
       {!leagueKey ? (
-        <p className="text-gray-400 text-center py-8">Select a league first.</p>
+        <p className="text-tertiary text-center py-8">Select a league first.</p>
       ) : (
         <>
           <div className="flex gap-2">
@@ -64,7 +64,7 @@ export default function TransactionsPage() {
                 className={`rounded-lg px-3 py-1.5 text-sm transition ${
                   txType === type.value
                     ? "bg-purple-600 text-white"
-                    : "border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
+                    : "border border-secondary bg-surface-secondary text-secondary hover:bg-surface-secondary"
                 }`}
               >
                 {type.label}

@@ -41,7 +41,7 @@ export default function TeamPage() {
 
   if (!session) {
     return (
-      <p className="text-center text-gray-500 py-16">
+      <p className="text-center text-muted py-16">
         Sign in to view your team.
       </p>
     );
@@ -51,9 +51,9 @@ export default function TeamPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">My Team</h1>
+          <h1 className="text-2xl font-bold text-primary">My Team</h1>
           {teamName && (
-            <p className="text-sm text-gray-400">{teamName}</p>
+            <p className="text-sm text-tertiary">{teamName}</p>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -62,7 +62,7 @@ export default function TeamPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+      <div className="rounded-lg border border-default bg-surface p-4">
         <RosterTable players={roster} statCategories={statCategories} loading={loading} />
       </div>
     </div>

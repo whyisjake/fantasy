@@ -29,12 +29,12 @@ export default function PlayerSearch({ onSearch, onFreeAgents, loading }: Player
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search players..."
-          className="flex-1 rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-purple-500 focus:outline-none"
+          className="flex-1 rounded-lg border border-secondary bg-surface-secondary px-4 py-2 text-sm text-secondary placeholder-gray-500 focus:border-purple-500 focus:outline-none"
         />
         <select
           value={position}
           onChange={(e) => setPosition(e.target.value)}
-          className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 focus:border-purple-500 focus:outline-none"
+          className="rounded-lg border border-secondary bg-surface-secondary px-3 py-2 text-sm text-secondary focus:border-purple-500 focus:outline-none"
         >
           {POSITIONS.map((pos) => (
             <option key={pos} value={pos}>
@@ -53,7 +53,7 @@ export default function PlayerSearch({ onSearch, onFreeAgents, loading }: Player
       <button
         onClick={() => onFreeAgents(position === "All" ? undefined : position)}
         disabled={loading}
-        className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 disabled:opacity-50 transition"
+        className="rounded-lg border border-secondary bg-surface-secondary px-4 py-2 text-sm text-secondary hover:bg-surface-secondary disabled:opacity-50 transition"
       >
         Browse Free Agents
       </button>

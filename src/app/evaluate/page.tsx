@@ -65,7 +65,7 @@ export default function EvaluatePage() {
 
   if (!session) {
     return (
-      <p className="text-center text-gray-500 py-16">
+      <p className="text-center text-muted py-16">
         Sign in to evaluate your roster.
       </p>
     );
@@ -79,18 +79,18 @@ export default function EvaluatePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Evaluate Roster</h1>
+        <h1 className="text-2xl font-bold text-primary">Evaluate Roster</h1>
         <div className="flex items-center gap-4">
           <button
             onClick={toggleDeepScan}
             className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
               deepScan
-                ? "bg-purple-600/20 text-purple-300 border border-purple-600/50"
-                : "bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700"
+                ? "bg-purple-600/20 text-accent border border-purple-600/50"
+                : "bg-surface-secondary text-tertiary border border-secondary hover:bg-surface-secondary"
             }`}
             title="Fetch 25 free agents per position and re-rank by your league's scoring categories"
           >
-            <span className={`inline-block w-2 h-2 rounded-full ${deepScan ? "bg-purple-400" : "bg-gray-600"}`} />
+            <span className={`inline-block w-2 h-2 rounded-full ${deepScan ? "bg-purple-400" : "bg-surface-secondary"}`} />
             Deep Scan
           </button>
           <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
@@ -98,19 +98,19 @@ export default function EvaluatePage() {
       </div>
 
       {!leagueKey && (
-        <p className="text-gray-400 text-center py-8">Select a league first.</p>
+        <p className="text-tertiary text-center py-8">Select a league first.</p>
       )}
 
       {loading && (
         <div className="space-y-4">
-          <div className="rounded-lg border border-gray-800 bg-gray-950 p-6 text-center">
+          <div className="rounded-lg border border-default bg-surface p-6 text-center">
             <div className="h-6 w-6 mx-auto mb-3 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" />
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-tertiary">
               Analyzing your roster against available free agents...
             </p>
           </div>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-14 animate-pulse rounded-lg bg-gray-800" />
+            <div key={i} className="h-14 animate-pulse rounded-lg bg-surface-secondary" />
           ))}
         </div>
       )}
@@ -125,24 +125,24 @@ export default function EvaluatePage() {
         <>
           {/* Summary Banner */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">
+            <div className="rounded-lg border border-default bg-surface p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted mb-1">
                 Recommended Moves
               </p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold text-primary">
                 {evalData.summary.recommended_moves.length}
               </p>
             </div>
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">
+            <div className="rounded-lg border border-default bg-surface p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted mb-1">
                 Weakest Positions
               </p>
               <p className="text-lg font-semibold text-yellow-400">
                 {evalData.summary.weakest_positions.join(", ") || "None"}
               </p>
             </div>
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-1">
+            <div className="rounded-lg border border-default bg-surface p-4">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted mb-1">
                 Injured Players
               </p>
               <p className="text-lg font-semibold text-red-400">
@@ -156,7 +156,7 @@ export default function EvaluatePage() {
           {/* Recommended Moves */}
           {evalData.summary.recommended_moves.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-white mb-3">
+              <h2 className="text-lg font-semibold text-primary mb-3">
                 Recommended Moves
               </h2>
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
@@ -174,7 +174,7 @@ export default function EvaluatePage() {
           {/* Batting Position Breakdown */}
           {evalData.roster.batting.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-white mb-3">
+              <h2 className="text-lg font-semibold text-primary mb-3">
                 Batting Positions
               </h2>
               <div className="space-y-2">
@@ -193,7 +193,7 @@ export default function EvaluatePage() {
           {/* Pitching Position Breakdown */}
           {evalData.roster.pitching.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-white mb-3">
+              <h2 className="text-lg font-semibold text-primary mb-3">
                 Pitching Positions
               </h2>
               <div className="space-y-2">

@@ -98,7 +98,7 @@ export default function PlayersPage() {
 
   if (!session) {
     return (
-      <p className="text-center text-gray-500 py-16">
+      <p className="text-center text-muted py-16">
         Sign in to search players.
       </p>
     );
@@ -107,7 +107,7 @@ export default function PlayersPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Players</h1>
+        <h1 className="text-2xl font-bold text-primary">Players</h1>
         <div className="flex items-center gap-3">
           <CoverageSelector value={coverage} onChange={setCoverage} />
           <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
@@ -115,7 +115,7 @@ export default function PlayersPage() {
       </div>
 
       {!leagueKey ? (
-        <p className="text-gray-400 text-center py-8">Select a league first.</p>
+        <p className="text-tertiary text-center py-8">Select a league first.</p>
       ) : (
         <>
           <PlayerSearch
@@ -124,16 +124,16 @@ export default function PlayersPage() {
             loading={loading}
           />
 
-          {message && <p className="text-sm text-gray-400">{message}</p>}
+          {message && <p className="text-sm text-tertiary">{message}</p>}
 
           {loading ? (
             <div className="space-y-2">
               {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="h-10 animate-pulse rounded bg-gray-800" />
+                <div key={i} className="h-10 animate-pulse rounded bg-surface-secondary" />
               ))}
             </div>
           ) : players.length > 0 && statCategories ? (
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+            <div className="rounded-lg border border-default bg-surface p-4">
               <PlayerStatsTable
                 players={players}
                 statCategories={statCategories}
@@ -142,8 +142,8 @@ export default function PlayersPage() {
               />
             </div>
           ) : players.length > 0 ? (
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-              <p className="text-sm text-gray-500 mb-4">Loading stat categories...</p>
+            <div className="rounded-lg border border-default bg-surface p-4">
+              <p className="text-sm text-muted mb-4">Loading stat categories...</p>
               <PlayerStatsTable
                 players={players}
                 statCategories={[]}

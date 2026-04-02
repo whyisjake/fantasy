@@ -23,7 +23,7 @@ export default function StandingsTable({ teams, loading }: StandingsTableProps) 
     return (
       <div className="space-y-2">
         {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="h-10 animate-pulse rounded bg-gray-800" />
+          <div key={i} className="h-10 animate-pulse rounded bg-surface-secondary" />
         ))}
       </div>
     );
@@ -31,7 +31,7 @@ export default function StandingsTable({ teams, loading }: StandingsTableProps) 
 
   if (teams.length === 0) {
     return (
-      <p className="text-center text-gray-500 py-8">No standings available.</p>
+      <p className="text-center text-muted py-8">No standings available.</p>
     );
   }
 
@@ -41,7 +41,7 @@ export default function StandingsTable({ teams, loading }: StandingsTableProps) 
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-800 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          <tr className="border-b border-default text-left text-xs font-medium uppercase tracking-wider text-muted">
             <th className="px-3 py-2 w-10">#</th>
             <th className="px-3 py-2">Team</th>
             <th className="px-3 py-2 w-12 text-right">W</th>
@@ -56,29 +56,29 @@ export default function StandingsTable({ teams, loading }: StandingsTableProps) 
             )}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-800/50">
+        <tbody className="divide-y divide-border/50">
           {sorted.map((team, i) => (
             <tr
               key={team.team_key}
-              className={`hover:bg-gray-800/30 transition ${
+              className={`hover:bg-surface-hover transition ${
                 i < 4 ? "border-l-2 border-l-green-600/50" : ""
               }`}
             >
-              <td className="px-3 py-2 text-gray-500">{team.rank}</td>
-              <td className="px-3 py-2 font-medium text-white flex items-center gap-2">
+              <td className="px-3 py-2 text-muted">{team.rank}</td>
+              <td className="px-3 py-2 font-medium text-primary flex items-center gap-2">
                 {team.logo && (
                   <img src={team.logo} alt="" className="h-5 w-5 rounded" />
                 )}
                 {team.name}
               </td>
-              <td className="px-3 py-2 text-right text-gray-300">{team.wins}</td>
-              <td className="px-3 py-2 text-right text-gray-300">{team.losses}</td>
-              <td className="px-3 py-2 text-right text-gray-300">{team.ties}</td>
-              <td className="px-3 py-2 text-right text-gray-300">{team.percentage}</td>
+              <td className="px-3 py-2 text-right text-secondary">{team.wins}</td>
+              <td className="px-3 py-2 text-right text-secondary">{team.losses}</td>
+              <td className="px-3 py-2 text-right text-secondary">{team.ties}</td>
+              <td className="px-3 py-2 text-right text-secondary">{team.percentage}</td>
               {team.points_for && (
                 <>
-                  <td className="px-3 py-2 text-right text-gray-300">{team.points_for}</td>
-                  <td className="px-3 py-2 text-right text-gray-300">{team.points_against}</td>
+                  <td className="px-3 py-2 text-right text-secondary">{team.points_for}</td>
+                  <td className="px-3 py-2 text-right text-secondary">{team.points_against}</td>
                 </>
               )}
             </tr>

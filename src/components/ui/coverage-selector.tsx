@@ -15,7 +15,7 @@ interface CoverageSelectorProps {
 
 export default function CoverageSelector({ value, onChange }: CoverageSelectorProps) {
   return (
-    <div className="flex gap-1 rounded-lg border border-gray-700 bg-gray-800 p-0.5">
+    <div className="flex gap-1 rounded-lg border border-secondary bg-surface-secondary p-0.5">
       {OPTIONS.map((opt) => (
         <button
           key={opt.value}
@@ -23,7 +23,7 @@ export default function CoverageSelector({ value, onChange }: CoverageSelectorPr
           className={`rounded px-2.5 py-1 text-xs font-medium transition ${
             value === opt.value
               ? "bg-purple-600 text-white"
-              : "text-gray-400 hover:text-gray-200"
+              : "text-tertiary hover:text-secondary"
           }`}
         >
           {opt.label}

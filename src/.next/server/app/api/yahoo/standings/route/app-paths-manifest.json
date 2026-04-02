@@ -1,0 +1,3 @@
+{
+  "/api/yahoo/standings/route": "app/api/yahoo/standings/route.js"
+}

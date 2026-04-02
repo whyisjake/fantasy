@@ -38,27 +38,27 @@ export default function TradeImpact({ impact, givePlayer, getPlayer }: TradeImpa
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-800 text-xs font-medium uppercase tracking-wider text-gray-500">
+            <tr className="border-b border-default text-xs font-medium uppercase tracking-wider text-muted">
               <th className="px-3 py-2 text-left">Category</th>
               <th className="px-3 py-2 text-right">{givePlayer.name}</th>
               <th className="px-3 py-2 text-right">{getPlayer.name}</th>
               <th className="px-3 py-2 text-right">Diff</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800/50">
+          <tbody className="divide-y divide-border/50">
             {Object.entries(impact.details).map(([cat, detail]) => (
-              <tr key={cat} className="hover:bg-gray-800/30 transition">
-                <td className="px-3 py-2 text-gray-300">{cat}</td>
-                <td className="px-3 py-2 text-right text-gray-400 tabular-nums">
+              <tr key={cat} className="hover:bg-surface-hover transition">
+                <td className="px-3 py-2 text-secondary">{cat}</td>
+                <td className="px-3 py-2 text-right text-tertiary tabular-nums">
                   {givePlayer.stats[cat] ?? "-"}
                 </td>
-                <td className="px-3 py-2 text-right text-gray-300 tabular-nums">
+                <td className="px-3 py-2 text-right text-secondary tabular-nums">
                   {getPlayer.stats[cat] ?? "-"}
                 </td>
                 <td
                   className={`px-3 py-2 text-right tabular-nums font-medium ${
                     detail.isEqual
-                      ? "text-gray-500"
+                      ? "text-muted"
                       : detail.isUpgrade
                       ? "text-green-400"
                       : "text-red-400"

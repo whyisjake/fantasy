@@ -17,14 +17,14 @@ export default function RosterTable({ players, statCategories, loading }: Roster
     return (
       <div className="space-y-2">
         {Array.from({ length: 15 }).map((_, i) => (
-          <div key={i} className="h-10 animate-pulse rounded bg-gray-800" />
+          <div key={i} className="h-10 animate-pulse rounded bg-surface-secondary" />
         ))}
       </div>
     );
   }
 
   if (players.length === 0) {
-    return <p className="text-center text-gray-500 py-8">No roster data available.</p>;
+    return <p className="text-center text-muted py-8">No roster data available.</p>;
   }
 
   const sorted = [...players].sort((a, b) => {
@@ -51,7 +51,7 @@ export default function RosterTable({ players, statCategories, loading }: Roster
     <div className="space-y-6">
       {startingBatters.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">
+          <h3 className="text-sm font-medium text-tertiary mb-2 uppercase tracking-wider">
             Batters
           </h3>
           <RosterSection players={startingBatters} categories={battingCats} />
@@ -59,7 +59,7 @@ export default function RosterTable({ players, statCategories, loading }: Roster
       )}
       {startingPitchers.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-400 mb-2 uppercase tracking-wider">
+          <h3 className="text-sm font-medium text-tertiary mb-2 uppercase tracking-wider">
             Pitchers
           </h3>
           <RosterSection players={startingPitchers} categories={pitchingCats} />
@@ -67,7 +67,7 @@ export default function RosterTable({ players, statCategories, loading }: Roster
       )}
       {(benchBatters.length > 0 || benchPitchers.length > 0) && (
         <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">
+          <h3 className="text-sm font-medium text-muted mb-2 uppercase tracking-wider">
             Bench / IL
           </h3>
           <RosterSection
@@ -94,9 +94,9 @@ function RosterSection({
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-800 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+          <tr className="border-b border-default text-left text-xs font-medium uppercase tracking-wider text-muted">
             <th className="px-3 py-2 w-12">Pos</th>
-            <th className="px-3 py-2 sticky left-0 bg-gray-950 z-10">Player</th>
+            <th className="px-3 py-2 sticky left-0 bg-surface z-10">Player</th>
             <th className="px-2 py-2 w-12">Team</th>
             <th className="px-2 py-2 w-16">Elig</th>
             {categories.map((cat) => (
@@ -104,18 +104,18 @@ function RosterSection({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-800/50">
+        <tbody className="divide-y divide-border/50">
           {players.map((player) => (
-            <tr key={player.player_key} className={`hover:bg-gray-800/30 transition ${dimmed ? "opacity-60" : ""}`}>
-              <td className={`px-3 py-2 font-medium ${dimmed ? "text-gray-500" : "text-purple-400"}`}>
+            <tr key={player.player_key} className={`hover:bg-surface-hover transition ${dimmed ? "opacity-60" : ""}`}>
+              <td className={`px-3 py-2 font-medium ${dimmed ? "text-muted" : "text-accent"}`}>
                 {player.roster_position || player.position?.split(",")[0]}
               </td>
-              <td className={`px-3 py-2 font-medium sticky left-0 bg-gray-950/95 z-10 ${dimmed ? "text-gray-400" : "text-white"}`}>
+              <td className={`px-3 py-2 font-medium sticky left-0 bg-surface/95 z-10 ${dimmed ? "text-tertiary" : "text-primary"}`}>
                 <div className="flex items-center gap-2">
                   {player.headshot ? (
                     <img src={player.headshot} alt="" className="h-6 w-6 rounded-full" />
                   ) : (
-                    <div className="h-6 w-6 rounded-full bg-gray-800 flex items-center justify-center text-[10px] text-gray-500">
+                    <div className="h-6 w-6 rounded-full bg-surface-secondary flex items-center justify-center text-[10px] text-muted">
                       {player.name?.charAt(0)}
                     </div>
                   )}
@@ -128,8 +128,8 @@ function RosterSection({
                           : player.status === "DTD"
                           ? "bg-yellow-900/30 text-yellow-400"
                           : player.status === "NA"
-                          ? "bg-gray-800 text-gray-400"
-                          : "bg-gray-800 text-gray-400"
+                          ? "bg-surface-secondary text-tertiary"
+                          : "bg-surface-secondary text-tertiary"
                       }`}
                       title={player.status_full}
                     >
@@ -138,12 +138,12 @@ function RosterSection({
                   )}
                 </div>
               </td>
-              <td className="px-2 py-2 text-gray-400">{player.team}</td>
-              <td className="px-2 py-2 text-gray-400">{player.position}</td>
+              <td className="px-2 py-2 text-tertiary">{player.team}</td>
+              <td className="px-2 py-2 text-tertiary">{player.position}</td>
               {categories.map((cat) => (
                 <td
                   key={cat.stat_id}
-                  className="px-2 py-2 text-right text-gray-300 tabular-nums"
+                  className="px-2 py-2 text-right text-secondary tabular-nums"
                 >
                   {getStatValue(player.stats, cat.stat_id)}
                 </td>

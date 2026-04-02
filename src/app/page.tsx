@@ -55,10 +55,10 @@ function DashboardContent() {
           </div>
         )}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-primary mb-2">
             Fantasy Baseball Manager
           </h1>
-          <p className="text-gray-400 max-w-md">
+          <p className="text-tertiary max-w-md">
             Connect your Yahoo account to manage your fantasy baseball team,
             view standings, search players, and handle transactions.
           </p>
@@ -76,13 +76,13 @@ function DashboardContent() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
         <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
       </div>
 
       {!leagueKey && (
-        <div className="rounded-lg border border-gray-800 bg-gray-950 p-8 text-center">
-          <p className="text-gray-400">
+        <div className="rounded-lg border border-default bg-surface p-8 text-center">
+          <p className="text-tertiary">
             Select a league above to get started.
           </p>
         </div>
@@ -110,11 +110,11 @@ export default function DashboardPage() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-      <p className="text-xs font-medium uppercase tracking-wider text-gray-500">
+    <div className="rounded-lg border border-default bg-surface p-4">
+      <p className="text-xs font-medium uppercase tracking-wider text-muted">
         {label}
       </p>
-      <p className="mt-1 text-lg font-semibold text-white">{value}</p>
+      <p className="mt-1 text-lg font-semibold text-primary">{value}</p>
     </div>
   );
 }

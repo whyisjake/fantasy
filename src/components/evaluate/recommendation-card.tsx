@@ -20,13 +20,13 @@ interface RecommendationCardProps {
 
 export default function RecommendationCard({ move, index }: RecommendationCardProps) {
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+    <div className="rounded-lg border border-default bg-surface p-4">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-600/20 text-xs font-medium text-purple-400">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-600/20 text-xs font-medium text-accent">
             {index + 1}
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
+          <span className="text-xs font-medium uppercase tracking-wider text-muted">
             {move.drop_position}
           </span>
         </div>
@@ -35,12 +35,12 @@ export default function RecommendationCard({ move, index }: RecommendationCardPr
       <div className="flex items-center gap-3 mb-3">
         <div className="flex-1">
           <p className="text-xs text-red-400 mb-0.5">Drop</p>
-          <p className="font-medium text-gray-300">{move.drop_name}</p>
+          <p className="font-medium text-secondary">{move.drop_name}</p>
         </div>
-        <span className="text-gray-600">&rarr;</span>
+        <span className="text-muted">&rarr;</span>
         <div className="flex-1">
           <p className="text-xs text-green-400 mb-0.5">Add</p>
-          <p className="font-medium text-white">{move.add_name}</p>
+          <p className="font-medium text-primary">{move.add_name}</p>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ export default function RecommendationCard({ move, index }: RecommendationCardPr
         ))}
       </div>
 
-      <p className="text-xs text-gray-400">{move.reason}</p>
+      <p className="text-xs text-tertiary">{move.reason}</p>
     </div>
   );
 }

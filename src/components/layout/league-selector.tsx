@@ -49,13 +49,13 @@ export default function LeagueSelector({
 
   if (loading) {
     return (
-      <div className="h-9 w-48 animate-pulse rounded bg-gray-800" />
+      <div className="h-9 w-48 animate-pulse rounded bg-surface-secondary" />
     );
   }
 
   if (leagues.length === 0) {
     return (
-      <p className="text-sm text-gray-500">No MLB leagues found</p>
+      <p className="text-sm text-muted">No MLB leagues found</p>
     );
   }
 
@@ -63,7 +63,7 @@ export default function LeagueSelector({
     <select
       value={selected || ""}
       onChange={(e) => onSelect(e.target.value)}
-      className="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-gray-200 focus:border-purple-500 focus:outline-none"
+      className="rounded border border-secondary bg-surface-secondary px-3 py-1.5 text-sm text-secondary focus:border-purple-500 focus:outline-none"
     >
       {leagues.map((league) => (
         <option key={league.league_key} value={league.league_key}>

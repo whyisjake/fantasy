@@ -6,18 +6,18 @@ export default function LoginButton() {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
-    return <div className="h-8 w-24 animate-pulse rounded bg-gray-700" />;
+    return <div className="h-8 w-24 animate-pulse rounded bg-surface-secondary" />;
   }
 
   if (session) {
     return (
       <div className="flex items-center gap-3">
-        <span className="text-sm text-gray-300">
+        <span className="text-sm text-secondary">
           {session.user?.name}
         </span>
         <button
           onClick={() => signOut()}
-          className="rounded bg-gray-700 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-600 transition"
+          className="rounded bg-surface-secondary px-3 py-1.5 text-sm text-secondary hover:bg-surface-secondary transition"
         >
           Sign Out
         </button>

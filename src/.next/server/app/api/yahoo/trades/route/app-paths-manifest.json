@@ -1,0 +1,3 @@
+{
+  "/api/yahoo/trades/route": "app/api/yahoo/trades/route.js"
+}

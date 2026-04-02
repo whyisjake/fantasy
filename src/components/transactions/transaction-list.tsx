@@ -27,7 +27,7 @@ export default function TransactionList({ transactions, loading }: TransactionLi
     return (
       <div className="space-y-3">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-16 animate-pulse rounded-lg bg-gray-800" />
+          <div key={i} className="h-16 animate-pulse rounded-lg bg-surface-secondary" />
         ))}
       </div>
     );
@@ -35,7 +35,7 @@ export default function TransactionList({ transactions, loading }: TransactionLi
 
   if (transactions.length === 0) {
     return (
-      <p className="text-center text-gray-500 py-8">No recent transactions.</p>
+      <p className="text-center text-muted py-8">No recent transactions.</p>
     );
   }
 
@@ -44,7 +44,7 @@ export default function TransactionList({ transactions, loading }: TransactionLi
       {transactions.map((tx, i) => (
         <div
           key={i}
-          className="rounded-lg border border-gray-800 bg-gray-950 p-4"
+          className="rounded-lg border border-default bg-surface p-4"
         >
           <div className="flex items-center justify-between mb-2">
             <span
@@ -56,13 +56,13 @@ export default function TransactionList({ transactions, loading }: TransactionLi
                   : tx.type === "drop"
                   ? "bg-red-900/30 text-red-400"
                   : tx.type === "trade"
-                  ? "bg-purple-900/30 text-purple-400"
-                  : "bg-gray-800 text-gray-400"
+                  ? "bg-purple-900/30 text-accent"
+                  : "bg-surface-secondary text-tertiary"
               }`}
             >
               {tx.type}
             </span>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-muted">
               {tx.timestamp
                 ? new Date(parseInt(tx.timestamp) * 1000).toLocaleDateString()
                 : ""}
@@ -80,12 +80,12 @@ export default function TransactionList({ transactions, loading }: TransactionLi
                 >
                   {player.transaction_type === "add" ? "+ ADD" : "- DROP"}
                 </span>
-                <span className="text-white">{player.name}</span>
-                <span className="text-gray-500">
+                <span className="text-primary">{player.name}</span>
+                <span className="text-muted">
                   {player.team} - {player.position}
                 </span>
                 {player.destination_team && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted">
                     &rarr; {player.destination_team}
                   </span>
                 )}

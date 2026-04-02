@@ -1,0 +1,3 @@
+{
+  "/api/yahoo/transactions/route": "app/api/yahoo/transactions/route.js"
+}

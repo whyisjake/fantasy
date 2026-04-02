@@ -18,22 +18,22 @@ interface PlayerCardProps {
 
 export default function PlayerCard({ player, onAdd }: PlayerCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-gray-800 bg-gray-950 p-4 hover:border-gray-700 transition">
+    <div className="flex items-center justify-between rounded-lg border border-default bg-surface p-4 hover:border-secondary transition">
       <div className="flex items-center gap-3">
         {player.headshot ? (
           <img
             src={player.headshot}
             alt={player.name}
-            className="h-10 w-10 rounded-full bg-gray-800"
+            className="h-10 w-10 rounded-full bg-surface-secondary"
           />
         ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-800 text-sm text-gray-500">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-secondary text-sm text-muted">
             {player.name?.charAt(0)}
           </div>
         )}
         <div>
-          <p className="font-medium text-white">{player.name}</p>
-          <p className="text-xs text-gray-400">
+          <p className="font-medium text-primary">{player.name}</p>
+          <p className="text-xs text-tertiary">
             {player.team} - {player.position}
             {player.status && (
               <span

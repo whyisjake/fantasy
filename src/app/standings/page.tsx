@@ -27,7 +27,7 @@ export default function StandingsPage() {
 
   if (!session) {
     return (
-      <p className="text-center text-gray-500 py-16">
+      <p className="text-center text-muted py-16">
         Sign in to view standings.
       </p>
     );
@@ -36,11 +36,11 @@ export default function StandingsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Standings</h1>
+        <h1 className="text-2xl font-bold text-primary">Standings</h1>
         <LeagueSelector onSelect={setLeagueKey} selected={leagueKey || undefined} />
       </div>
 
-      <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+      <div className="rounded-lg border border-default bg-surface p-4">
         <StandingsTable teams={standings} loading={loading} />
       </div>
     </div>
