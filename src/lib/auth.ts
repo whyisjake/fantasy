@@ -1,7 +1,27 @@
 import { type NextAuthOptions } from "next-auth";
 
+const DEPLOY_VERSION = "v6-state-only-no-idtoken";
+
+console.log(`[fantasy-auth] Loading auth config ${DEPLOY_VERSION}`, {
+  NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+  hasClientId: !!process.env.YAHOO_CLIENT_ID,
+  hasClientSecret: !!process.env.YAHOO_CLIENT_SECRET,
+  clientIdLength: process.env.YAHOO_CLIENT_ID?.length,
+});
+
 export const authOptions: NextAuthOptions = {
   debug: true,
+  logger: {
+    error(code, metadata) {
+      console.error(`[fantasy-auth][${DEPLOY_VERSION}] ERROR`, code, JSON.stringify(metadata, null, 2));
+    },
+    warn(code) {
+      console.warn(`[fantasy-auth][${DEPLOY_VERSION}] WARN`, code);
+    },
+    debug(code, metadata) {
+      console.log(`[fantasy-auth][${DEPLOY_VERSION}] DEBUG`, code, JSON.stringify(metadata, null, 2));
+    },
+  },
   providers: [
     {
       id: "yahoo",
