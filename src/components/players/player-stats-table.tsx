@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import type { PlayerWithStats, StatCategory } from "@/types/player";
 import { getStatValue, isPitcher, getRelevantCategories } from "@/lib/stat-mapping";
 import StatHeader from "@/components/ui/stat-header";
+import { useWatchlist } from "@/lib/watchlist-context";
 
 interface PlayerStatsTableProps {
   players: PlayerWithStats[];
@@ -124,6 +125,8 @@ function StatsTable({
   onSort: (statId: string, defaultAsc: boolean) => void;
   onAdd?: (playerKey: string) => void;
 }) {
+  const { addToWatchlist, removeFromWatchlist, isWatched } = useWatchlist();
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -142,74 +145,104 @@ function StatsTable({
                 onSort={onSort}
               />
             ))}
-            {onAdd && <th className="px-2 py-2 w-12" />}
+            <th className="px-2 py-2 w-16" />
           </tr>
         </thead>
         <tbody className="divide-y divide-border/50">
-          {players.map((player) => (
-            <tr key={player.player_key} className="hover:bg-surface-hover transition">
-              <td className="px-3 py-2 sticky left-0 bg-surface/95 z-10">
-                <div className="flex items-center gap-2">
-                  {player.headshot ? (
-                    <img src={player.headshot} alt="" className="h-6 w-6 rounded-full" />
-                  ) : (
-                    <div className="h-6 w-6 rounded-full bg-surface-secondary flex items-center justify-center text-[10px] text-muted">
-                      {player.name?.charAt(0)}
-                    </div>
-                  )}
-                  <span className="font-medium text-primary whitespace-nowrap">
-                    {player.name}
-                  </span>
-                  {player.status && (
-                    <span
-                      className={`text-[10px] px-1 rounded ${
-                        player.status === "IL"
-                          ? "bg-red-900/30 text-red-400"
-                          : "bg-yellow-900/30 text-yellow-400"
-                      }`}
-                    >
-                      {player.status}
+          {players.map((player) => {
+            const watched = isWatched(player.player_key);
+            return (
+              <tr key={player.player_key} className="hover:bg-surface-hover transition">
+                <td className="px-3 py-2 sticky left-0 bg-surface/95 z-10">
+                  <div className="flex items-center gap-2">
+                    {player.headshot ? (
+                      <img src={player.headshot} alt="" className="h-6 w-6 rounded-full" />
+                    ) : (
+                      <div className="h-6 w-6 rounded-full bg-surface-secondary flex items-center justify-center text-[10px] text-muted">
+                        {player.name?.charAt(0)}
+                      </div>
+                    )}
+                    <span className="font-medium text-primary whitespace-nowrap">
+                      {player.name}
                     </span>
-                  )}
-                </div>
-              </td>
-              <td className="px-2 py-2 text-tertiary">{player.team}</td>
-              <td className="px-2 py-2 text-accent">{player.position}</td>
-              <td className="px-2 py-2 text-right text-tertiary tabular-nums">
-                {player.percent_owned !== undefined ? (
-                  <div className="flex items-center justify-end gap-1">
-                    <span>{player.percent_owned}%</span>
-                    {player.ownership_change !== undefined && player.ownership_change !== 0 && (
+                    {player.status && (
                       <span
-                        className={`text-[10px] ${
-                          player.ownership_change > 0 ? "text-green-400" : "text-red-400"
+                        className={`text-[10px] px-1 rounded ${
+                          player.status === "IL"
+                            ? "bg-red-900/30 text-red-400"
+                            : "bg-yellow-900/30 text-yellow-400"
                         }`}
                       >
-                        {player.ownership_change > 0 ? `+${player.ownership_change}` : player.ownership_change}
+                        {player.status}
                       </span>
                     )}
                   </div>
-                ) : (
-                  "-"
-                )}
-              </td>
-              {categories.map((cat) => (
-                <td key={cat.stat_id} className="px-2 py-2 text-right text-secondary tabular-nums">
-                  {getStatValue(player.stats, cat.stat_id)}
                 </td>
-              ))}
-              {onAdd && (
+                <td className="px-2 py-2 text-tertiary">{player.team}</td>
+                <td className="px-2 py-2 text-accent">{player.position}</td>
+                <td className="px-2 py-2 text-right text-tertiary tabular-nums">
+                  {player.percent_owned !== undefined ? (
+                    <div className="flex items-center justify-end gap-1">
+                      <span>{player.percent_owned}%</span>
+                      {player.ownership_change !== undefined && player.ownership_change !== 0 && (
+                        <span
+                          className={`text-[10px] ${
+                            player.ownership_change > 0 ? "text-green-400" : "text-red-400"
+                          }`}
+                        >
+                          {player.ownership_change > 0 ? `+${player.ownership_change}` : player.ownership_change}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                {categories.map((cat) => (
+                  <td key={cat.stat_id} className="px-2 py-2 text-right text-secondary tabular-nums">
+                    {getStatValue(player.stats, cat.stat_id)}
+                  </td>
+                ))}
                 <td className="px-2 py-2">
-                  <button
-                    onClick={() => onAdd(player.player_key)}
-                    className="rounded bg-green-700 px-2 py-1 text-xs text-white hover:bg-green-600 transition"
-                  >
-                    +
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() =>
+                        watched
+                          ? removeFromWatchlist(player.player_key)
+                          : addToWatchlist({
+                              player_key: player.player_key,
+                              name: player.name,
+                              team: player.team,
+                              position: player.position,
+                              headshot: player.headshot,
+                              status: player.status,
+                            })
+                      }
+                      className={`rounded px-1.5 py-1 text-xs transition ${
+                        watched
+                          ? "bg-purple-600/20 text-accent hover:bg-purple-600/30"
+                          : "bg-surface-secondary text-muted hover:text-secondary hover:bg-surface-hover"
+                      }`}
+                      title={watched ? "Remove from watchlist" : "Add to watchlist"}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                        <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                        <path fillRule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                    {onAdd && (
+                      <button
+                        onClick={() => onAdd(player.player_key)}
+                        className="rounded bg-green-700 px-2 py-1 text-xs text-white hover:bg-green-600 transition"
+                      >
+                        +
+                      </button>
+                    )}
+                  </div>
                 </td>
-              )}
-            </tr>
-          ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

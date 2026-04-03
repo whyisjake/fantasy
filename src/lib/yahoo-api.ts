@@ -164,6 +164,21 @@ export async function getTransactions(
   return data;
 }
 
+// Get specific players by their player keys
+export async function getPlayersByKeys(
+  accessToken: string,
+  leagueKey: string,
+  playerKeys: string[],
+  coverage: StatCoverage = "season"
+) {
+  const keys = playerKeys.join(",");
+  const data = await yahooFetch({
+    accessToken,
+    path: `/league/${leagueKey}/players;player_keys=${keys};out=ownership${statCoveragePath(coverage)}`,
+  });
+  return data;
+}
+
 // Add/drop player
 export async function addDropPlayer(
   accessToken: string,

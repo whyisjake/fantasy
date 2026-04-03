@@ -111,7 +111,10 @@ export async function GET(request: NextRequest) {
 
     // Build summary
     const allEvals = [...battingEval, ...pitchingEval];
-    const injuredPlayers = roster.filter((p) => p.status === "IL" || p.status === "IL10" || p.status === "IL60");
+    const injuredPlayers = roster.filter((p) =>
+      p.status === "IL" || p.status === "IL10" || p.status === "IL15" || p.status === "IL60" ||
+      p.status === "NA" || p.roster_position === "NA"
+    );
 
     const upgradeSlots = allEvals
       .filter((e) => e.upgrade_available)
@@ -378,7 +381,7 @@ function buildPositionEval(
 
   for (const player of rosterPlayers) {
     const rosterPos = player.roster_position || player.position.split(",")[0];
-    if (rosterPos === "BN" || rosterPos === "IL" || rosterPos === "DL") continue;
+    if (rosterPos === "BN" || rosterPos === "IL" || rosterPos === "DL" || rosterPos === "NA") continue;
 
     // Find relevant free agents — match to position
     const matchPos = positions.find((p) =>

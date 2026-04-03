@@ -10,7 +10,7 @@ interface RosterTableProps {
   loading?: boolean;
 }
 
-const POSITION_ORDER = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "Util", "BN", "SP", "RP", "DL", "IL"];
+const POSITION_ORDER = ["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "Util", "BN", "SP", "RP", "DL", "IL", "NA"];
 
 export default function RosterTable({ players, statCategories, loading }: RosterTableProps) {
   if (loading) {
@@ -68,7 +68,7 @@ export default function RosterTable({ players, statCategories, loading }: Roster
       {(benchBatters.length > 0 || benchPitchers.length > 0) && (
         <div>
           <h3 className="text-sm font-medium text-muted mb-2 uppercase tracking-wider">
-            Bench / IL
+            Bench / IL / NA
           </h3>
           <RosterSection
             players={[...benchBatters, ...benchPitchers]}

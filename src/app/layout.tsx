@@ -4,6 +4,8 @@ import "./globals.css";
 import AuthSessionProvider from "@/components/auth/session-provider";
 import { LeagueProvider } from "@/lib/league-context";
 import { ThemeProvider } from "@/lib/theme-context";
+import { WatchlistProvider } from "@/lib/watchlist-context";
+import { Analytics } from "@vercel/analytics/react";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 
@@ -37,14 +39,17 @@ export default function RootLayout({
         <AuthSessionProvider>
           <ThemeProvider>
             <LeagueProvider>
-              <Sidebar />
-              <div className="flex flex-1 flex-col overflow-hidden">
-                <Header />
-                <main className="flex-1 overflow-y-auto p-6">{children}</main>
-              </div>
+              <WatchlistProvider>
+                <Sidebar />
+                <div className="flex flex-1 flex-col overflow-hidden">
+                  <Header />
+                  <main className="flex-1 overflow-y-auto p-6">{children}</main>
+                </div>
+              </WatchlistProvider>
             </LeagueProvider>
           </ThemeProvider>
         </AuthSessionProvider>
+        <Analytics />
       </body>
     </html>
   );

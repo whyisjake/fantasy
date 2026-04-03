@@ -9,6 +9,7 @@ const navItems = [
   { href: "/standings", label: "Standings", icon: "🏆" },
   { href: "/players", label: "Players", icon: "👤" },
   { href: "/evaluate", label: "Evaluate", icon: "📊" },
+  { href: "/watchlist", label: "Watchlist", icon: "👁" },
   { href: "/trades", label: "Trades", icon: "🤝" },
   { href: "/transactions", label: "Transactions", icon: "🔄" },
 ];
